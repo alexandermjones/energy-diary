@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#0d1210"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="Energy Diary"/>
+  <meta name="description" content="Track your energy through the working day"/>
+  <title>Energy Diary</title>
+
+  <!-- Inline PWA Manifest -->
+  <script>
+    const manifest = {
+      name: "Energy Diary",
+      short_name: "Energy",
+      description: "Track your energy through the working day",
+      start_url: ".",
+      display: "standalone",
+      background_color: "#0d1210",
+      theme_color: "#0d1210",
+      orientation: "portrait",
+      icons: [
+        {
+          src: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMTkyIDE5MiI+CiAgPHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSIzMiIgZmlsbD0iIzBkMTIxMCIvPgogIDx0ZXh0IHg9Ijk2IiB5PSIxMzAiIGZvbnQtZmFtaWx5PSJzZXJpZiIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNhM2M0YTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPuKaoTwvdGV4dD4KPC9zdmc+",
+          sizes: "192x192",
+          type: "image/svg+xml",
+          purpose: "any maskable"
+        },
+        {
+          src: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+CiAgPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSI4MCIgZmlsbD0iIzBkMTIxMCIvPgogIDx0ZXh0IHg9IjI1NiIgeT0iMzUwIiBmb250LWZhbWlseT0ic2VyaWYiIGZvbnQtc2l6ZT0iMjgwIiBmaWxsPSIjYTNjNGEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7imqE8L3RleHQ+Cjwvc3ZnPg==",
+          sizes: "512x512",
+          type: "image/svg+xml",
+          purpose: "any maskable"
+        }
+      ]
+    };
+    const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+    const manifestURL = URL.createObjectURL(blob);
+    document.write('<link rel="manifest" href="' + manifestURL + '">');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital@0;1&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --bg: #0d0d10;
+      --bg2: #12111a;
+      --bg3: #0d1210;
+      --text: #e8e0d0;
+      --muted: rgba(255,255,255,0.3);
+      --subtle: rgba(255,255,255,0.08);
+      --green: #a3c4a0;
+      --green-bright: #2ecc71;
+      --red: #e74c3c;
+      --gold: #f1c40f;
+      --orange: #e67e22;
+      --serif: 'Playfair Display', Georgia, serif;
+      --body: 'Lora', Georgia, serif;
+      --mono: 'DM Mono', 'Courier New', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0d0d10 0%, #12111a 50%, #0d1210 100%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+    #app {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 48px 20px 80px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.22); } 100% { transform: scale(1.18); } }
+
+    /* HEADER */
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(255,255,255,0.22);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(24px, 6vw, 32px);
+      font-weight: 400;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 28px;
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--subtle);
+      margin-bottom: 28px;
+    }
+
+    .tab {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: rgba(255,255,255,0.3);
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 8px 20px 10px;
+      transition: all 0.2s;
+      margin-bottom: -1px;
+    }
+
+    .tab.active {
+      color: var(--green);
+      border-bottom-color: var(--green);
+    }
+
+    /* VIEWS */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* INSIGHTS */
+    .insights {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--subtle);
+      border-radius: 14px;
+      padding: 20px 22px;
+      margin-bottom: 24px;
+    }
+
+    .insights-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      font-weight: 400;
+    }
+
+    .insights-grid {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .insight-item {
+      flex: 1;
+      min-width: 100px;
+    }
+
+    .insight-item + .insight-item {
+      border-left: 1px solid rgba(255,255,255,0.07);
+      padding-left: 16px;
+    }
+
+    .insight-label {
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .insight-label.green { color: var(--green-bright); }
+    .insight-label.red { color: var(--red); }
+
+    .insight-value {
+      font-family: var(--serif);
+      font-size: 26px;
+      color: var(--text);
+    }
+
+    .insight-value span { font-size: 13px; color: rgba(255,255,255,0.3); }
+
+    .insight-value-sm {
+      font-family: var(--serif);
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    /* ENTRY CARD */
+    .entry-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 10px;
+      transition: background 0.2s;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .entry-activity {
+      font-family: var(--serif);
+      font-size: 15px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .entry-time-badge {
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-left: 8px;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.18);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      padding: 0 4px;
+      transition: color 0.2s;
+      flex-shrink: 0;
+    }
+
+    .delete-btn:hover { color: var(--red); }
+
+    .energy-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .energy-pill {
+      font-size: 11px;
+      font-family: var(--mono);
+      padding: 3px 9px;
+      border-radius: 6px;
+    }
+
+    .arrow { color: rgba(255,255,255,0.2); font-size: 13px; }
+
+    .delta {
+      margin-left: auto;
+      font-size: 13px;
+      font-family: var(--mono);
+    }
+
+    .entry-note {
+      margin-top: 10px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.42);
+      font-style: italic;
+      line-height: 1.6;
+      border-left: 2px solid rgba(255,255,255,0.1);
+      padding-left: 10px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 56px 0;
+      color: rgba(255,255,255,0.18);
+      font-style: italic;
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    /* FORM */
+    .field { margin-bottom: 24px; }
+
+    .field-label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .field-label .optional { color: rgba(255,255,255,0.18); }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .seg-btn {
+      flex: 1;
+      padding: 10px 4px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      color: rgba(255,255,255,0.4);
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .seg-btn.selected {
+      background: rgba(163,196,160,0.15);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    select {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 13px 14px;
+      color: var(--text);
+      font-family: var(--body);
+      font-size: 14px;
+      cursor: pointer;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.3)' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+    }
+
+    select:focus { outline: none; border-color: rgba(163,196,160,0.4); }
+    select option { background: #1a1a20; }
+
+    .energy-dots {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .dot-wrap { text-align: center; }
+
+    .energy-dot {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: block;
+      margin: 0 auto 5px;
+    }
+
+    .energy-dot.selected { animation: pop 0.2s ease forwards; }
+
+    .dot-label {
+      font-size: 8px;
+      color: rgba(255,255,255,0.22);
+      font-family: var(--mono);
+    }
+
+    textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 10px;
+      padding: 13px 14px;
+      color: var(--text);
+      font-family: var(--body);
+      font-style: italic;
+      font-size: 14px;
+      resize: none;
+      line-height: 1.6;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus { outline: none; border-color: rgba(163,196,160,0.35); }
+    textarea::placeholder { color: rgba(255,255,255,0.2); }
+
+    .submit-btn {
+      width: 100%;
+      padding: 15px;
+      background: rgba(255,255,255,0.06);
+      border: none;
+      border-radius: 12px;
+      color: rgba(255,255,255,0.2);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: not-allowed;
+      transition: all 0.25s ease;
+      font-weight: 500;
+    }
+
+    .submit-btn.ready {
+      background: var(--green);
+      color: #0d1210;
+      cursor: pointer;
+    }
+
+    .submit-btn.ready:hover { filter: brightness(1.1); }
+    .submit-btn.saved { background: var(--green-bright); color: #fff; }
+
+    /* DATA ACTIONS */
+    .data-actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .data-btn {
+      flex: 1;
+      padding: 10px 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 10px;
+      color: rgba(255,255,255,0.45);
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .data-btn:hover { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); }
+    .data-btn.export:hover { border-color: var(--green); color: var(--green); }
+    .data-btn.import-btn:hover { border-color: #7fb3d3; color: #7fb3d3; }
+
+    .data-btn .btn-icon { display: block; font-size: 16px; margin-bottom: 4px; }
+
+    .import-confirm {
+      display: none;
+      background: rgba(127,179,211,0.08);
+      border: 1px solid rgba(127,179,211,0.25);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 20px;
+    }
+
+    .import-confirm.visible { display: block; }
+    .import-confirm p { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.6; margin-bottom: 12px; font-style: italic; }
+    .import-confirm p strong { color: #7fb3d3; font-style: normal; }
+
+    .import-confirm-btns { display: flex; gap: 8px; }
+
+    .confirm-yes {
+      flex: 1; padding: 9px; background: #7fb3d3; border: none; border-radius: 8px;
+      color: #0d1210; font-family: var(--mono); font-size: 10px; letter-spacing: 1px;
+      text-transform: uppercase; cursor: pointer;
+    }
+
+    .confirm-no {
+      flex: 1; padding: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; color: rgba(255,255,255,0.4); font-family: var(--mono); font-size: 10px;
+      letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+    }
+
+    /* INSTALL BANNER */
+    .install-banner {
+      display: none;
+      background: rgba(163,196,160,0.1);
+      border: 1px solid rgba(163,196,160,0.25);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .install-banner.visible { display: flex; }
+
+    .install-text { flex: 1; font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.4; }
+    .install-text strong { color: var(--green); font-style: normal; }
+
+    .install-btn {
+      background: var(--green);
+      color: #0d1210;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .install-close {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.25);
+      cursor: pointer;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Header -->
+  <div class="eyebrow">Energy Diary</div>
+  <h1 id="date-heading"></h1>
+  <p class="subtitle" id="subtitle">Log your first entry for today</p>
+
+  <!-- Install Banner -->
+  <div class="install-banner" id="install-banner">
+    <div class="install-text"><strong>Add to Home Screen</strong><br>Install for quick daily access</div>
+    <button class="install-btn" id="install-btn">Install</button>
+    <button class="install-close" id="install-close">×</button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-tab="log">Today's Log</button>
+    <button class="tab" data-tab="add">+ New Entry</button>
+  </div>
+
+  <!-- LOG VIEW -->
+  <div class="view active" id="view-log">
+    <div id="insights-panel"></div>
+    <div id="entries-list"></div>
+
+    <!-- Export / Import -->
+    <div class="data-actions" id="data-actions" style="display:none">
+      <button class="data-btn export" id="export-btn">
+        <span class="btn-icon">↓</span>Export JSON
+      </button>
+      <button class="data-btn import-btn" id="import-trigger-btn">
+        <span class="btn-icon">↑</span>Import JSON
+      </button>
+    </div>
+
+    <div class="import-confirm" id="import-confirm">
+      <p id="import-confirm-msg">Loading…</p>
+      <div class="import-confirm-btns">
+        <button class="confirm-yes" id="confirm-yes-btn">Merge & Import</button>
+        <button class="confirm-no" id="confirm-no-btn">Cancel</button>
+      </div>
+    </div>
+
+    <input type="file" id="file-input" accept=".json" style="display:none"/>
+  </div>
+
+  <!-- ADD VIEW -->
+  <div class="view" id="view-add">
+
+    <div class="field">
+      <label class="field-label">Time of Day</label>
+      <div class="btn-group" id="time-group">
+        <button class="seg-btn selected" data-time="Morning">Morning</button>
+        <button class="seg-btn" data-time="After Lunch">After Lunch</button>
+        <button class="seg-btn" data-time="End of Day">End of Day</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Activity</label>
+      <select id="activity-select">
+        <option>Deep work / analysis</option>
+        <option>Meeting</option>
+        <option>Presenting</option>
+        <option>Mentoring / teaching</option>
+        <option>Admin / email</option>
+        <option>Creative thinking</option>
+        <option>Collaboration</option>
+        <option>Strategy / planning</option>
+        <option>Client interaction</option>
+        <option>One-to-one conversation</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Energy Before</label>
+      <div class="energy-dots" id="dots-before"></div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Energy After</label>
+      <div class="energy-dots" id="dots-after"></div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Note <span class="optional">(optional)</span></label>
+      <textarea id="note-input" rows="2" placeholder="What felt good or draining about this?"></textarea>
+    </div>
+
+    <button class="submit-btn" id="submit-btn">Log Entry</button>
+  </div>
+
+</div>
+
+<script>
+  // ─── Data ───────────────────────────────────────────────────────────────────
+
+  const ENERGY = [
+    { v: 1, label: 'Drained',   color: '#c0392b' },
+    { v: 2, label: 'Low',       color: '#e67e22' },
+    { v: 3, label: 'Neutral',   color: '#f1c40f' },
+    { v: 4, label: 'Energised', color: '#2ecc71' },
+    { v: 5, label: 'Alive',     color: '#1abc9c' },
+  ];
+
+  const TODAY_KEY = new Date().toDateString();
+  const TODAY_LABEL = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  let entries = [];
+  let selectedTime = 'Morning';
+  let selectedBefore = null;
+  let selectedAfter = null;
+
+  try { entries = JSON.parse(localStorage.getItem('energy-diary') || '[]'); } catch {}
+
+  // ─── Utilities ──────────────────────────────────────────────────────────────
+
+  function save() { localStorage.setItem('energy-diary', JSON.stringify(entries)); }
+
+  function todayEntries() { return entries.filter(e => e.dateKey === TODAY_KEY); }
+
+  function el(id) { return document.getElementById(id); }
+
+  function energyInfo(v) { return ENERGY.find(e => e.v === v); }
+
+  // ─── Render ─────────────────────────────────────────────────────────────────
+
+  function renderHeader() {
+    el('date-heading').textContent = TODAY_LABEL;
+    const count = todayEntries().length;
+    el('subtitle').textContent = count === 0
+      ? 'Log your first entry for today'
+      : `${count} entr${count === 1 ? 'y' : 'ies'} logged`;
+  }
+
+  function renderInsights() {
+    const panel = el('insights-panel');
+    const te = todayEntries();
+    if (te.length < 2) { panel.innerHTML = ''; return; }
+
+    const avg = (te.reduce((s, e) => s + e.after, 0) / te.length).toFixed(1);
+    const givers = te.filter(e => e.after > e.before).sort((a, b) => (b.after - b.before) - (a.after - a.before));
+    const drainers = te.filter(e => e.after < e.before).sort((a, b) => (a.after - a.before) - (b.after - b.before));
+    const giver = givers[0];
+    const drainer = drainers[0];
+
+    panel.innerHTML = `
+      <div class="insights">
+        <div class="insights-title">Today's Patterns</div>
+        <div class="insights-grid">
+          <div class="insight-item">
+            <div class="insight-label">Avg Energy After</div>
+            <div class="insight-value">${avg}<span>/5</span></div>
+          </div>
+          ${giver ? `
+          <div class="insight-item">
+            <div class="insight-label green">↑ Energy Giver</div>
+            <div class="insight-value-sm">${giver.activity}</div>
+          </div>` : ''}
+          ${drainer ? `
+          <div class="insight-item">
+            <div class="insight-label red">↓ Energy Drainer</div>
+            <div class="insight-value-sm">${drainer.activity}</div>
+          </div>` : ''}
+        </div>
+      </div>`;
+  }
+
+  function renderEntries() {
+    const list = el('entries-list');
+    const te = todayEntries();
+    if (te.length === 0) {
+      list.innerHTML = `<div class="empty-state">Nothing logged yet —<br>your energy story starts now.</div>`;
+      return;
+    }
+    list.innerHTML = te.map(e => {
+      const b = energyInfo(e.before);
+      const a = energyInfo(e.after);
+      const delta = e.after - e.before;
+      const deltaStr = delta > 0 ? `+${delta}` : delta === 0 ? '±0' : `${delta}`;
+      const deltaColor = delta > 0 ? '#2ecc71' : delta < 0 ? '#e74c3c' : 'rgba(255,255,255,0.3)';
+      return `
+        <div class="entry-card">
+          <div class="entry-header">
+            <div>
+              <span class="entry-activity">${e.activity}</span>
+              <span class="entry-time-badge">${e.time}</span>
+            </div>
+            <button class="delete-btn" onclick="deleteEntry(${e.id})">×</button>
+          </div>
+          <div class="energy-row">
+            <span class="energy-pill" style="color:${b.color};background:${b.color}22">${b.label}</span>
+            <span class="arrow">→</span>
+            <span class="energy-pill" style="color:${a.color};background:${a.color}22">${a.label}</span>
+            <span class="delta" style="color:${deltaColor}">${deltaStr}</span>
+          </div>
+          ${e.note ? `<div class="entry-note">${e.note}</div>` : ''}
+        </div>`;
+    }).join('');
+  }
+
+  function renderDots(containerId, selectedVal, onSelect) {
+    const container = el(containerId);
+    container.innerHTML = ENERGY.map(lv => `
+      <div class="dot-wrap">
+        <button class="energy-dot ${selectedVal === lv.v ? 'selected' : ''}"
+          data-v="${lv.v}"
+          style="
+            background: ${selectedVal === lv.v ? lv.color : lv.color + '33'};
+            border-color: ${selectedVal === lv.v ? lv.color : 'transparent'};
+            box-shadow: ${selectedVal === lv.v ? `0 0 12px ${lv.color}88` : 'none'};
+            transform: ${selectedVal === lv.v ? 'scale(1.18)' : 'scale(1)'};
+          "
+          onclick="${onSelect}(${lv.v})">
+        </button>
+        <div class="dot-label">${lv.label}</div>
+      </div>`).join('');
+  }
+
+  function renderAll() {
+    renderHeader();
+    renderInsights();
+    renderEntries();
+    renderDataActions();
+    renderDots('dots-before', selectedBefore, 'setBefore');
+    renderDots('dots-after', selectedAfter, 'setAfter');
+    updateSubmit();
+  }
+
+  function updateSubmit() {
+    const btn = el('submit-btn');
+    const ready = selectedBefore !== null && selectedAfter !== null;
+    btn.classList.toggle('ready', ready);
+    btn.classList.remove('saved');
+    btn.textContent = 'Log Entry';
+  }
+
+  // ─── Actions ────────────────────────────────────────────────────────────────
+
+  window.setBefore = function(v) {
+    selectedBefore = v;
+    renderDots('dots-before', selectedBefore, 'setBefore');
+    updateSubmit();
+  };
+
+  window.setAfter = function(v) {
+    selectedAfter = v;
+    renderDots('dots-after', selectedAfter, 'setAfter');
+    updateSubmit();
+  };
+
+  window.deleteEntry = function(id) {
+    entries = entries.filter(e => e.id !== id);
+    save();
+    renderAll();
+  };
+
+  el('submit-btn').addEventListener('click', () => {
+    if (selectedBefore === null || selectedAfter === null) return;
+    const entry = {
+      id: Date.now(),
+      dateKey: TODAY_KEY,
+      date: TODAY_LABEL,
+      time: selectedTime,
+      activity: el('activity-select').value,
+      before: selectedBefore,
+      after: selectedAfter,
+      note: el('note-input').value.trim(),
+    };
+    entries.unshift(entry);
+    save();
+
+    const btn = el('submit-btn');
+    btn.textContent = '✓ Saved';
+    btn.classList.add('saved');
+
+    setTimeout(() => {
+      selectedBefore = null;
+      selectedAfter = null;
+      el('note-input').value = '';
+      switchTab('log');
+      renderAll();
+    }, 800);
+  });
+
+  // ─── Tabs ────────────────────────────────────────────────────────────────────
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+  }
+
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+
+  // ─── Time Segment ────────────────────────────────────────────────────────────
+
+  document.querySelectorAll('[data-time]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedTime = btn.dataset.time;
+      document.querySelectorAll('[data-time]').forEach(b => b.classList.toggle('selected', b === btn));
+    });
+  });
+
+  // ─── PWA Install ─────────────────────────────────────────────────────────────
+
+  let deferredPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    el('install-banner').classList.add('visible');
+  });
+
+  el('install-btn').addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    el('install-banner').classList.remove('visible');
+  });
+
+  el('install-close').addEventListener('click', () => {
+    el('install-banner').classList.remove('visible');
+  });
+
+  // ─── Service Worker ──────────────────────────────────────────────────────────
+
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+      const CACHE = 'energy-diary-v1';
+      const ASSETS = [self.location.pathname];
+      self.addEventListener('install', e => {
+        e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+        self.skipWaiting();
+      });
+      self.addEventListener('activate', e => {
+        e.waitUntil(caches.keys().then(keys =>
+          Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+        ));
+        self.clients.claim();
+      });
+      self.addEventListener('fetch', e => {
+        e.respondWith(
+          caches.match(e.request).then(r => r || fetch(e.request))
+        );
+      });
+    `;
+    const swBlob = new Blob([swCode], { type: 'application/javascript' });
+    const swURL = URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swURL).catch(() => {});
+  }
+
+  // ─── Export / Import ─────────────────────────────────────────────────────────
+
+  function renderDataActions() {
+    const actionsEl = el('data-actions');
+    actionsEl.style.display = entries.length > 0 ? 'flex' : 'none';
+  }
+
+  // Export
+  el('export-btn').addEventListener('click', () => {
+    const payload = { version: 1, exported: new Date().toISOString(), entries };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const dateStr = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `energy-diary-${dateStr}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // Import — trigger file picker
+  let pendingImport = null;
+
+  el('import-trigger-btn').addEventListener('click', () => {
+    el('file-input').value = '';
+    el('file-input').click();
+  });
+
+  el('file-input').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const parsed = JSON.parse(ev.target.result);
+        const incoming = Array.isArray(parsed) ? parsed : (parsed.entries || []);
+        if (!incoming.length) { alert('No entries found in that file.'); return; }
+
+        // Deduplicate preview
+        const existingIds = new Set(entries.map(e => e.id));
+        const newOnes = incoming.filter(e => !existingIds.has(e.id));
+        const dupes = incoming.length - newOnes.length;
+
+        pendingImport = newOnes;
+        const msg = el('import-confirm-msg');
+        msg.innerHTML = `Found <strong>${incoming.length}</strong> entr${incoming.length === 1 ? 'y' : 'ies'} in file.`
+          + (dupes > 0 ? ` <strong>${dupes}</strong> already exist and will be skipped.` : '')
+          + ` <strong>${newOnes.length}</strong> new entr${newOnes.length === 1 ? 'y' : 'ies'} will be added.`;
+        el('import-confirm').classList.add('visible');
+      } catch {
+        alert('Could not read that file — make sure it\'s a valid Energy Diary JSON export.');
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  el('confirm-yes-btn').addEventListener('click', () => {
+    if (!pendingImport) return;
+    entries = [...entries, ...pendingImport].sort((a, b) => b.id - a.id);
+    save();
+    pendingImport = null;
+    el('import-confirm').classList.remove('visible');
+    renderAll();
+  });
+
+  el('confirm-no-btn').addEventListener('click', () => {
+    pendingImport = null;
+    el('import-confirm').classList.remove('visible');
+  });
+
+  // ─── Init ────────────────────────────────────────────────────────────────────
+  renderAll();
+</script>
+</body>
+</html>
