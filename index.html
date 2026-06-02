@@ -197,8 +197,8 @@
     }
 
     /* VIEWS */
-    .view { display: none; visibility: hidden; position: absolute; pointer-events: none; }
-    .view.active { display: block; visibility: visible; position: static; pointer-events: auto; }
+    .view { display: none; }
+    .view.active { display: block; }
 
     /* INSIGHTS */
     .insights {
@@ -827,7 +827,7 @@
 </div>
 
 <script>
-  // ─── Data ───────────────────────────────────────────────────────────────────
+  // ─── Constants & State ───────────────────────────────────────────────────────
 
   const ENERGY = [
     { v: 1, label: 'Drained',   color: '#c0392b' },
@@ -843,76 +843,61 @@
     'Client interaction', 'One-to-one conversation', 'Other'
   ];
 
-  let selectedActivity = ACTIVITIES[0];
+  const TODAY_KEY   = new Date().toDateString();
   const TODAY_LABEL = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
 
-  let entries = [];
-  let selectedTime = 'Morning';
-  let selectedBefore = null;
-  let selectedAfter = null;
-  let viewDate = new Date(); // the day currently being viewed
+  let entries         = [];
+  let viewDate        = new Date();
+  let selectedTime    = 'Morning';
+  let selectedBefore  = null;
+  let selectedAfter   = null;
+  let selectedActivity = ACTIVITIES[0];
+  let patternsScope   = 7;
+  let pendingImport   = null;
+  let deferredPrompt  = null;
 
   try { entries = JSON.parse(localStorage.getItem('energy-diary') || '[]'); } catch {}
 
-  // ─── Utilities ──────────────────────────────────────────────────────────────
+  // ─── Utilities ───────────────────────────────────────────────────────────────
 
-  function save() { localStorage.setItem('energy-diary', JSON.stringify(entries)); }
+  function el(id)         { return document.getElementById(id); }
+  function save()         { localStorage.setItem('energy-diary', JSON.stringify(entries)); }
+  function dateKey(d)     { return d.toDateString(); }
+  function dateLabel(d)   { return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }); }
+  function isToday(d)     { return dateKey(d) === TODAY_KEY; }
+  function energyInfo(v)  { return ENERGY.find(e => e.v === v); }
+  function viewEntries()  { return entries.filter(e => e.dateKey === dateKey(viewDate)); }
 
-  function dateKey(d) { return d.toDateString(); }
-  function dateLabel(d) { return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }); }
-  function isToday(d) { return dateKey(d) === TODAY_KEY; }
-
-  function viewEntries() { return entries.filter(e => e.dateKey === dateKey(viewDate)); }
-  function todayEntries() { return entries.filter(e => e.dateKey === TODAY_KEY); }
-
-  // Get all unique days that have entries, sorted newest first
   function daysWithEntries() {
     const keys = [...new Set(entries.map(e => e.dateKey))];
     return keys.map(k => new Date(k)).sort((a, b) => b - a);
   }
 
-  // Step viewDate to prev/next day that has entries (or today for next)
   function stepDay(dir) {
     const days = daysWithEntries();
-    // Always include today even if no entries
     if (!days.find(d => dateKey(d) === TODAY_KEY)) days.unshift(new Date());
     days.sort((a, b) => b - a);
-
-    const cur = dateKey(viewDate);
-    const idx = days.findIndex(d => dateKey(d) === cur);
-
-    if (dir === -1 && idx < days.length - 1) { viewDate = days[idx + 1]; }
-    else if (dir === 1 && idx > 0) { viewDate = days[idx - 1]; }
+    const idx = days.findIndex(d => dateKey(d) === dateKey(viewDate));
+    if (dir === -1 && idx < days.length - 1) viewDate = days[idx + 1];
+    else if (dir === 1 && idx > 0)           viewDate = days[idx - 1];
     renderAll();
   }
 
-  function el(id) { return document.getElementById(id); }
-  function energyInfo(v) { return ENERGY.find(e => e.v === v); }
-
-  function renderActivityPicker() {
-    const picker = el('activity-picker');
-    picker.innerHTML = ACTIVITIES.map(a => `
-      <button class="activity-pill ${a === selectedActivity ? 'selected' : ''}"
-        onclick="selectActivity('${a.replace(/'/g, "\\'")}')">${a}</button>
-    `).join('');
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
   }
 
-  window.selectActivity = function(a) {
-    selectedActivity = a;
-    renderActivityPicker();
-  };
+  // ─── Render ──────────────────────────────────────────────────────────────────
 
   function renderHeader() {
     el('date-heading').textContent = dateLabel(viewDate);
     const todayViewing = isToday(viewDate);
     el('today-badge').style.display = todayViewing ? 'inline-block' : 'none';
-
     const count = viewEntries().length;
     el('subtitle').textContent = count === 0
       ? (todayViewing ? 'Log your first entry for today' : 'No entries for this day')
-      : `${count} entr${count === 1 ? 'y' : 'ies'} logged`;
-
-    // Nav buttons
+      : count + ' entr' + (count === 1 ? 'y' : 'ies') + ' logged';
     const days = daysWithEntries();
     if (!days.find(d => dateKey(d) === TODAY_KEY)) days.unshift(new Date());
     days.sort((a, b) => b - a);
@@ -921,37 +906,31 @@
     el('nav-next').disabled = idx <= 0;
   }
 
+  function renderTabs() {
+    const addTab = document.querySelector('.tab[data-tab="add"]');
+    const viewing = isToday(viewDate);
+    addTab.style.display = viewing ? '' : 'none';
+    if (!viewing) {
+      const cur = document.querySelector('.tab.active');
+      if (cur && cur.dataset.tab === 'add') switchTab('log');
+    }
+  }
+
   function renderInsights() {
     const panel = el('insights-panel');
     const te = viewEntries();
     if (te.length < 2) { panel.innerHTML = ''; return; }
-
     const avg = (te.reduce((s, e) => s + e.after, 0) / te.length).toFixed(1);
-    const givers = te.filter(e => e.after > e.before).sort((a, b) => (b.after - b.before) - (a.after - a.before));
+    const givers   = te.filter(e => e.after > e.before).sort((a, b) => (b.after - b.before) - (a.after - a.before));
     const drainers = te.filter(e => e.after < e.before).sort((a, b) => (a.after - a.before) - (b.after - b.before));
-    const giver = givers[0];
+    const giver   = givers[0];
     const drainer = drainers[0];
-
-    panel.innerHTML = `
-      <div class="insights">
-        <div class="insights-title">Today's Patterns</div>
-        <div class="insights-grid">
-          <div class="insight-item">
-            <div class="insight-label">Avg Energy After</div>
-            <div class="insight-value">${avg}<span>/5</span></div>
-          </div>
-          ${giver ? `
-          <div class="insight-item">
-            <div class="insight-label green">↑ Energy Giver</div>
-            <div class="insight-value-sm">${giver.activity}</div>
-          </div>` : ''}
-          ${drainer ? `
-          <div class="insight-item">
-            <div class="insight-label red">↓ Energy Drainer</div>
-            <div class="insight-value-sm">${drainer.activity}</div>
-          </div>` : ''}
-        </div>
-      </div>`;
+    var html = '<div class="insights"><div class="insights-title">Today\'s Patterns</div><div class="insights-grid">';
+    html += '<div class="insight-item"><div class="insight-label">Avg Energy After</div><div class="insight-value">' + avg + '<span>/5</span></div></div>';
+    if (giver)   html += '<div class="insight-item"><div class="insight-label green">&#8593; Energy Giver</div><div class="insight-value-sm">' + giver.activity + '</div></div>';
+    if (drainer) html += '<div class="insight-item"><div class="insight-label red">&#8595; Energy Drainer</div><div class="insight-value-sm">' + drainer.activity + '</div></div>';
+    html += '</div></div>';
+    panel.innerHTML = html;
   }
 
   function renderEntries() {
@@ -959,116 +938,193 @@
     const te = viewEntries();
     const isPast = !isToday(viewDate);
     if (te.length === 0) {
-      list.innerHTML = `<div class="empty-state">${isPast ? 'No entries were logged<br>on this day.' : 'Nothing logged yet —<br>your energy story starts now.'}</div>`;
+      list.innerHTML = '<div class="empty-state">' + (isPast ? 'No entries were logged<br>on this day.' : 'Nothing logged yet —<br>your energy story starts now.') + '</div>';
       return;
     }
-    list.innerHTML = te.map(e => {
-      const b = energyInfo(e.before);
-      const a = energyInfo(e.after);
-      const delta = e.after - e.before;
-      const deltaStr = delta > 0 ? `+${delta}` : delta === 0 ? '±0' : `${delta}`;
-      const deltaColor = delta > 0 ? '#2ecc71' : delta < 0 ? '#e74c3c' : 'rgba(255,255,255,0.3)';
-      return `
-        <div class="entry-card">
-          <div class="entry-header">
-            <div>
-              <span class="entry-activity">${e.activity}</span>
-              <span class="entry-time-badge">${e.time}</span>
-            </div>
-            <button class="delete-btn" onclick="deleteEntry(${e.id})" title="Delete entry">×</button>
-          </div>
-          <div class="energy-row">
-            <span class="energy-pill" style="color:${b.color};background:${b.color}22">${b.label}</span>
-            <span class="arrow">→</span>
-            <span class="energy-pill" style="color:${a.color};background:${a.color}22">${a.label}</span>
-            <span class="delta" style="color:${deltaColor}">${deltaStr}</span>
-          </div>
-          ${e.note ? `<div class="entry-note">${e.note}</div>` : ''}
-        </div>`;
+    list.innerHTML = te.map(function(e) {
+      var b = energyInfo(e.before);
+      var a = energyInfo(e.after);
+      var delta = e.after - e.before;
+      var deltaStr = delta > 0 ? '+' + delta : delta === 0 ? '±0' : '' + delta;
+      var deltaColor = delta > 0 ? '#2ecc71' : delta < 0 ? '#e74c3c' : 'rgba(255,255,255,0.3)';
+      var html = '<div class="entry-card">'
+        + '<div class="entry-header"><div>'
+        + '<span class="entry-activity">' + e.activity + '</span>'
+        + '<span class="entry-time-badge">' + e.time + '</span>'
+        + '</div>'
+        + '<button class="delete-btn" data-id="' + e.id + '" title="Delete entry">&times;</button>'
+        + '</div>'
+        + '<div class="energy-row">'
+        + '<span class="energy-pill" style="color:' + b.color + ';background:' + b.color + '22">' + b.label + '</span>'
+        + '<span class="arrow">&#8594;</span>'
+        + '<span class="energy-pill" style="color:' + a.color + ';background:' + a.color + '22">' + a.label + '</span>'
+        + '<span class="delta" style="color:' + deltaColor + '">' + deltaStr + '</span>'
+        + '</div>';
+      if (e.note) html += '<div class="entry-note">' + e.note + '</div>';
+      html += '</div>';
+      return html;
     }).join('');
   }
 
-  function renderDots(containerId, selectedVal, onSelect) {
-    const container = el(containerId);
-    container.innerHTML = ENERGY.map(lv => `
-      <div class="dot-wrap">
-        <button class="energy-dot ${selectedVal === lv.v ? 'selected' : ''}"
-          data-v="${lv.v}"
-          style="
-            background: ${selectedVal === lv.v ? lv.color : lv.color + '33'};
-            border-color: ${selectedVal === lv.v ? lv.color : 'transparent'};
-            box-shadow: ${selectedVal === lv.v ? `0 0 12px ${lv.color}88` : 'none'};
-            transform: ${selectedVal === lv.v ? 'scale(1.18)' : 'scale(1)'};
-          "
-          onclick="${onSelect}(${lv.v})">
-        </button>
-        <div class="dot-label">${lv.label}</div>
-      </div>`).join('');
+  function renderDots(containerId, selectedVal) {
+    var container = el(containerId);
+    container.innerHTML = ENERGY.map(function(lv) {
+      var isSel = selectedVal === lv.v;
+      var bg     = isSel ? lv.color : lv.color + '33';
+      var border = isSel ? lv.color : 'transparent';
+      var shadow = isSel ? '0 0 12px ' + lv.color + '88' : 'none';
+      var scale  = isSel ? 'scale(1.18)' : 'scale(1)';
+      return '<div class="dot-wrap">'
+        + '<button class="energy-dot' + (isSel ? ' selected' : '') + '"'
+        + ' data-dotid="' + containerId + '"'
+        + ' data-v="' + lv.v + '"'
+        + ' style="background:' + bg + ';border-color:' + border + ';box-shadow:' + shadow + ';transform:' + scale + '">'
+        + '</button>'
+        + '<div class="dot-label">' + lv.label + '</div>'
+        + '</div>';
+    }).join('');
   }
 
-  function renderAll() {
-    renderHeader();
-    renderInsights();
-    renderEntries();
-    renderPatterns();
-    renderDataActions();
-    renderTabs();
-    renderActivityPicker();
-    renderDots('dots-before', selectedBefore, 'setBefore');
-    renderDots('dots-after', selectedAfter, 'setAfter');
-    updateSubmit();
+  function renderActivityPicker() {
+    var picker = el('activity-picker');
+    picker.innerHTML = ACTIVITIES.map(function(a) {
+      return '<button class="activity-pill' + (a === selectedActivity ? ' selected' : '') + '" data-activity="' + a + '">' + a + '</button>';
+    }).join('');
+  }
+
+  function renderDataActions() {
+    var hasEntries = entries.length > 0;
+    var btn = el('export-btn');
+    btn.disabled = !hasEntries;
+    btn.style.opacity = hasEntries ? '1' : '0.3';
+    btn.style.cursor  = hasEntries ? 'pointer' : 'not-allowed';
+  }
+
+  function renderPatterns() {
+    var scoped;
+    if (patternsScope === 'all') {
+      scoped = entries;
+    } else {
+      var cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - patternsScope);
+      cutoff.setHours(0, 0, 0, 0);
+      scoped = entries.filter(function(e) { return new Date(e.id) >= cutoff; });
+    }
+    var summaryEl = el('patterns-summary');
+    var listEl    = el('patterns-list');
+    if (scoped.length === 0) {
+      summaryEl.innerHTML = '';
+      listEl.innerHTML = '<div class="patterns-empty">Not enough data yet —<br>keep logging for a few days.</div>';
+      return;
+    }
+    var grouped = {};
+    scoped.forEach(function(e) {
+      if (!grouped[e.activity]) grouped[e.activity] = [];
+      grouped[e.activity].push(e);
+    });
+    var stats = Object.keys(grouped).map(function(name) {
+      var es = grouped[name];
+      var avgDelta = es.reduce(function(s, e) { return s + (e.after - e.before); }, 0) / es.length;
+      var avgAfter = es.reduce(function(s, e) { return s + e.after; }, 0) / es.length;
+      return { name: name, count: es.length, avgDelta: avgDelta, avgAfter: avgAfter };
+    }).sort(function(a, b) { return b.avgDelta - a.avgDelta; });
+    var totalDays = new Set(scoped.map(function(e) { return e.dateKey; })).size;
+    var overallAvg = (scoped.reduce(function(s, e) { return s + e.after; }, 0) / scoped.length).toFixed(1);
+    summaryEl.innerHTML = '<div class="patterns-summary">'
+      + '<div class="summary-stat"><span class="summary-stat-value">' + scoped.length + '</span><span class="summary-stat-label">Entries</span></div>'
+      + '<div class="summary-stat"><span class="summary-stat-value">' + totalDays + '</span><span class="summary-stat-label">Days</span></div>'
+      + '<div class="summary-stat"><span class="summary-stat-value">' + overallAvg + '<span style="font-size:12px;color:rgba(255,255,255,0.3)">/5</span></span><span class="summary-stat-label">Avg Energy</span></div>'
+      + '</div>';
+    var maxAbs = Math.max.apply(null, stats.map(function(s) { return Math.abs(s.avgDelta); }).concat([1]));
+    listEl.innerHTML = stats.map(function(s) {
+      var color    = s.avgDelta > 0.3 ? '#2ecc71' : s.avgDelta < -0.3 ? '#e74c3c' : '#f1c40f';
+      var barWidth = Math.round((Math.abs(s.avgDelta) / maxAbs) * 100);
+      var deltaStr = (s.avgDelta > 0 ? '+' : '') + s.avgDelta.toFixed(1);
+      var tag      = s.avgDelta > 0.3 ? '&#8593; Giver' : s.avgDelta < -0.3 ? '&#8595; Drainer' : '&#8594; Neutral';
+      return '<div class="pattern-card">'
+        + '<div class="pattern-top"><span class="pattern-name">' + s.name + '</span><span class="pattern-avg" style="color:' + color + '">' + deltaStr + '</span></div>'
+        + '<div class="pattern-bar-wrap"><div class="pattern-bar" style="width:' + barWidth + '%;background:' + color + '"></div></div>'
+        + '<div class="pattern-meta">'
+        + '<span class="pattern-meta-item">Logged <span>' + s.count + '&times;</span></span>'
+        + '<span class="pattern-meta-item">Avg after <span>' + s.avgAfter.toFixed(1) + '/5</span></span>'
+        + '<span class="pattern-meta-item" style="color:' + color + '">' + tag + '</span>'
+        + '</div></div>';
+    }).join('');
   }
 
   function updateSubmit() {
-    const btn = el('submit-btn');
-    const ready = selectedBefore !== null && selectedAfter !== null;
+    var btn   = el('submit-btn');
+    var ready = selectedBefore !== null && selectedAfter !== null;
     btn.classList.toggle('ready', ready);
     btn.classList.remove('saved');
     btn.textContent = 'Log Entry';
   }
 
-  // ─── Actions ────────────────────────────────────────────────────────────────
-
-  window.setBefore = function(v) {
-    selectedBefore = v;
-    renderDots('dots-before', selectedBefore, 'setBefore');
+  function renderAll() {
+    renderHeader();
+    renderTabs();
+    renderInsights();
+    renderEntries();
+    renderPatterns();
+    renderDataActions();
+    renderActivityPicker();
+    renderDots('dots-before', selectedBefore);
+    renderDots('dots-after',  selectedAfter);
     updateSubmit();
-  };
+  }
 
-  window.setAfter = function(v) {
-    selectedAfter = v;
-    renderDots('dots-after', selectedAfter, 'setAfter');
-    updateSubmit();
-  };
+  // ─── Event Delegation ────────────────────────────────────────────────────────
 
-  window.deleteEntry = function(id) {
-    entries = entries.filter(e => e.id !== id);
-    save();
-    renderAll();
-  };
+  document.addEventListener('click', function(e) {
+    // Energy dots
+    var dot = e.target.closest('.energy-dot');
+    if (dot) {
+      var v = parseInt(dot.dataset.v);
+      if (dot.dataset.dotid === 'dots-before') { selectedBefore = v; renderDots('dots-before', selectedBefore); }
+      if (dot.dataset.dotid === 'dots-after')  { selectedAfter  = v; renderDots('dots-after',  selectedAfter);  }
+      updateSubmit();
+      return;
+    }
+    // Activity pills
+    var pill = e.target.closest('.activity-pill');
+    if (pill) {
+      selectedActivity = pill.dataset.activity;
+      renderActivityPicker();
+      return;
+    }
+    // Delete entry
+    var del = e.target.closest('.delete-btn');
+    if (del) {
+      var id = parseInt(del.dataset.id);
+      entries = entries.filter(function(e) { return e.id !== id; });
+      save();
+      renderAll();
+      return;
+    }
+  });
 
-  el('submit-btn').addEventListener('click', () => {
+  // ─── Form ────────────────────────────────────────────────────────────────────
+
+  el('submit-btn').addEventListener('click', function() {
     if (selectedBefore === null || selectedAfter === null) return;
-    const entry = {
-      id: Date.now(),
-      dateKey: TODAY_KEY,
-      date: TODAY_LABEL,
-      time: selectedTime,
+    var entry = {
+      id:       Date.now(),
+      dateKey:  TODAY_KEY,
+      date:     TODAY_LABEL,
+      time:     selectedTime,
       activity: selectedActivity,
-      before: selectedBefore,
-      after: selectedAfter,
-      note: el('note-input').value.trim(),
+      before:   selectedBefore,
+      after:    selectedAfter,
+      note:     el('note-input').value.trim(),
     };
     entries.unshift(entry);
     save();
-
-    const btn = el('submit-btn');
+    var btn = el('submit-btn');
     btn.textContent = '✓ Saved';
     btn.classList.add('saved');
-
-    setTimeout(() => {
+    setTimeout(function() {
       selectedBefore = null;
-      selectedAfter = null;
+      selectedAfter  = null;
       el('note-input').value = '';
       viewDate = new Date();
       switchTab('log');
@@ -1076,260 +1132,120 @@
     }, 800);
   });
 
-  // ─── Day Navigation ──────────────────────────────────────────────────────────
-
-  el('nav-prev').addEventListener('click', () => stepDay(-1));
-  el('nav-next').addEventListener('click', () => stepDay(1));
-
-  // ─── Tabs ────────────────────────────────────────────────────────────────────
-
-  function switchTab(name) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
-  }
-
-  function renderTabs() {
-    const addTab = document.querySelector('.tab[data-tab="add"]');
-    const viewing = isToday(viewDate);
-    addTab.style.display = viewing ? '' : 'none';
-    if (!viewing) {
-      const currentTab = document.querySelector('.tab.active');
-      if (currentTab && currentTab.dataset.tab === 'add') switchTab('log');
-    }
-  }
-
-  document.querySelectorAll('.tab').forEach(btn => {
-    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-  });
-
-  // ─── Time Segment ────────────────────────────────────────────────────────────
-
-  document.querySelectorAll('[data-time]').forEach(btn => {
-    btn.addEventListener('click', () => {
+  document.querySelectorAll('[data-time]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
       selectedTime = btn.dataset.time;
-      document.querySelectorAll('[data-time]').forEach(b => b.classList.toggle('selected', b === btn));
+      document.querySelectorAll('[data-time]').forEach(function(b) {
+        b.classList.toggle('selected', b === btn);
+      });
     });
   });
 
-  // ─── PWA Install ─────────────────────────────────────────────────────────────
+  // ─── Navigation ──────────────────────────────────────────────────────────────
 
-  let deferredPrompt = null;
+  el('nav-prev').addEventListener('click', function() { stepDay(-1); });
+  el('nav-next').addEventListener('click', function() { stepDay(1); });
 
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    el('install-banner').classList.add('visible');
+  document.querySelectorAll('.tab').forEach(function(btn) {
+    btn.addEventListener('click', function() { switchTab(btn.dataset.tab); });
   });
 
-  el('install-btn').addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    el('install-banner').classList.remove('visible');
-  });
-
-  el('install-close').addEventListener('click', () => {
-    el('install-banner').classList.remove('visible');
-  });
-
-  // ─── Service Worker ──────────────────────────────────────────────────────────
-
-  if ('serviceWorker' in navigator) {
-    const swCode = `
-      const CACHE = 'energy-diary-v1';
-      const ASSETS = [self.location.pathname];
-      self.addEventListener('install', e => {
-        e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
-        self.skipWaiting();
-      });
-      self.addEventListener('activate', e => {
-        e.waitUntil(caches.keys().then(keys =>
-          Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-        ));
-        self.clients.claim();
-      });
-      self.addEventListener('fetch', e => {
-        e.respondWith(
-          caches.match(e.request).then(r => r || fetch(e.request))
-        );
-      });
-    `;
-    const swBlob = new Blob([swCode], { type: 'application/javascript' });
-    const swURL = URL.createObjectURL(swBlob);
-    navigator.serviceWorker.register(swURL).catch(() => {});
-  }
-
-  // ─── Patterns ────────────────────────────────────────────────────────────────
-
-  let patternsScope = 7;
-
-  function entriesInScope() {
-    if (patternsScope === 'all') return entries;
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - patternsScope);
-    cutoff.setHours(0, 0, 0, 0);
-    return entries.filter(e => new Date(e.id) >= cutoff);
-  }
-
-  function renderPatterns() {
-    const scoped = entriesInScope();
-    const summaryEl = el('patterns-summary');
-    const listEl = el('patterns-list');
-
-    if (scoped.length === 0) {
-      summaryEl.innerHTML = '';
-      listEl.innerHTML = `<div class="patterns-empty">Not enough data yet —<br>keep logging for a few days.</div>`;
-      return;
-    }
-
-    // Group by activity
-    const grouped = {};
-    scoped.forEach(e => {
-      if (!grouped[e.activity]) grouped[e.activity] = [];
-      grouped[e.activity].push(e);
-    });
-
-    // Build stats per activity
-    const stats = Object.entries(grouped).map(([name, es]) => {
-      const avgDelta = es.reduce((s, e) => s + (e.after - e.before), 0) / es.length;
-      const avgAfter = es.reduce((s, e) => s + e.after, 0) / es.length;
-      return { name, count: es.length, avgDelta, avgAfter };
-    }).sort((a, b) => b.avgDelta - a.avgDelta);
-
-    // Overall summary stats
-    const totalDays = new Set(scoped.map(e => e.dateKey)).size;
-    const overallAvgAfter = (scoped.reduce((s, e) => s + e.after, 0) / scoped.length).toFixed(1);
-    const topGiver = stats[0];
-    const topDrainer = stats[stats.length - 1];
-
-    summaryEl.innerHTML = `
-      <div class="patterns-summary">
-        <div class="summary-stat">
-          <span class="summary-stat-value">${scoped.length}</span>
-          <span class="summary-stat-label">Entries</span>
-        </div>
-        <div class="summary-stat">
-          <span class="summary-stat-value">${totalDays}</span>
-          <span class="summary-stat-label">Days</span>
-        </div>
-        <div class="summary-stat">
-          <span class="summary-stat-value">${overallAvgAfter}<span style="font-size:12px;color:rgba(255,255,255,0.3)">/5</span></span>
-          <span class="summary-stat-label">Avg Energy</span>
-        </div>
-      </div>`;
-
-    // Max absolute delta for bar scaling
-    const maxAbs = Math.max(...stats.map(s => Math.abs(s.avgDelta)), 1);
-
-    listEl.innerHTML = stats.map(s => {
-      const isPositive = s.avgDelta >= 0;
-      const color = s.avgDelta > 0.3 ? '#2ecc71'
-                  : s.avgDelta < -0.3 ? '#e74c3c'
-                  : '#f1c40f';
-      const barWidth = Math.round((Math.abs(s.avgDelta) / maxAbs) * 100);
-      const deltaStr = s.avgDelta > 0 ? `+${s.avgDelta.toFixed(1)}` : s.avgDelta.toFixed(1);
-
-      return `
-        <div class="pattern-card">
-          <div class="pattern-top">
-            <span class="pattern-name">${s.name}</span>
-            <span class="pattern-avg" style="color:${color}">${deltaStr}</span>
-          </div>
-          <div class="pattern-bar-wrap">
-            <div class="pattern-bar" style="width:${barWidth}%;background:${color}"></div>
-          </div>
-          <div class="pattern-meta">
-            <span class="pattern-meta-item">Logged <span>${s.count}×</span></span>
-            <span class="pattern-meta-item">Avg after <span>${s.avgAfter.toFixed(1)}/5</span></span>
-            <span class="pattern-meta-item" style="color:${color}">${s.avgDelta > 0.3 ? '↑ Giver' : s.avgDelta < -0.3 ? '↓ Drainer' : '→ Neutral'}</span>
-          </div>
-        </div>`;
-    }).join('');
-  }
-
-  document.querySelectorAll('.scope-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
+  document.querySelectorAll('.scope-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
       patternsScope = btn.dataset.scope === 'all' ? 'all' : parseInt(btn.dataset.scope);
-      document.querySelectorAll('.scope-btn').forEach(b => b.classList.toggle('active', b === btn));
+      document.querySelectorAll('.scope-btn').forEach(function(b) { b.classList.toggle('active', b === btn); });
       renderPatterns();
     });
   });
 
   // ─── Export / Import ─────────────────────────────────────────────────────────
 
-  function renderDataActions() {
-    const actionsEl = el('data-actions');
-    actionsEl.style.display = 'flex';
-    const exportBtn = el('export-btn');
-    const hasEntries = entries.length > 0;
-    exportBtn.disabled = !hasEntries;
-    exportBtn.style.opacity = hasEntries ? '1' : '0.3';
-    exportBtn.style.cursor = hasEntries ? 'pointer' : 'not-allowed';
-  }
-
-  // Export
-  el('export-btn').addEventListener('click', () => {
-    const payload = { version: 1, exported: new Date().toISOString(), entries };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    const dateStr = new Date().toISOString().slice(0, 10);
-    a.href = url;
-    a.download = `energy-diary-${dateStr}.json`;
+  el('export-btn').addEventListener('click', function() {
+    if (!entries.length) return;
+    var payload = { version: 1, exported: new Date().toISOString(), entries: entries };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href   = url;
+    a.download = 'energy-diary-' + new Date().toISOString().slice(0, 10) + '.json';
     a.click();
     URL.revokeObjectURL(url);
   });
 
-  // Import — trigger file picker
-  let pendingImport = null;
-
-  el('import-trigger-btn').addEventListener('click', () => {
+  el('import-trigger-btn').addEventListener('click', function() {
     el('file-input').value = '';
     el('file-input').click();
   });
 
-  el('file-input').addEventListener('change', (e) => {
-    const file = e.target.files[0];
+  el('file-input').addEventListener('change', function(e) {
+    var file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
+    var reader = new FileReader();
+    reader.onload = function(ev) {
       try {
-        const parsed = JSON.parse(ev.target.result);
-        const incoming = Array.isArray(parsed) ? parsed : (parsed.entries || []);
+        var parsed   = JSON.parse(ev.target.result);
+        var incoming = Array.isArray(parsed) ? parsed : (parsed.entries || []);
         if (!incoming.length) { alert('No entries found in that file.'); return; }
-
-        // Deduplicate preview
-        const existingIds = new Set(entries.map(e => e.id));
-        const newOnes = incoming.filter(e => !existingIds.has(e.id));
-        const dupes = incoming.length - newOnes.length;
-
+        var existingIds = new Set(entries.map(function(e) { return e.id; }));
+        var newOnes  = incoming.filter(function(e) { return !existingIds.has(e.id); });
+        var dupes    = incoming.length - newOnes.length;
         pendingImport = newOnes;
-        const msg = el('import-confirm-msg');
-        msg.innerHTML = `Found <strong>${incoming.length}</strong> entr${incoming.length === 1 ? 'y' : 'ies'} in file.`
-          + (dupes > 0 ? ` <strong>${dupes}</strong> already exist and will be skipped.` : '')
-          + ` <strong>${newOnes.length}</strong> new entr${newOnes.length === 1 ? 'y' : 'ies'} will be added.`;
+        var msg = 'Found ' + incoming.length + ' entr' + (incoming.length === 1 ? 'y' : 'ies') + ' in file.';
+        if (dupes > 0) msg += ' ' + dupes + ' already exist and will be skipped.';
+        msg += ' ' + newOnes.length + ' new entr' + (newOnes.length === 1 ? 'y' : 'ies') + ' will be added.';
+        el('import-confirm-msg').textContent = msg;
         el('import-confirm').classList.add('visible');
-      } catch {
+      } catch(err) {
         alert('Could not read that file — make sure it\'s a valid Energy Diary JSON export.');
       }
     };
     reader.readAsText(file);
   });
 
-  el('confirm-yes-btn').addEventListener('click', () => {
+  el('confirm-yes-btn').addEventListener('click', function() {
     if (!pendingImport) return;
-    entries = [...entries, ...pendingImport].sort((a, b) => b.id - a.id);
+    entries = entries.concat(pendingImport).sort(function(a, b) { return b.id - a.id; });
     save();
     pendingImport = null;
     el('import-confirm').classList.remove('visible');
     renderAll();
   });
 
-  el('confirm-no-btn').addEventListener('click', () => {
+  el('confirm-no-btn').addEventListener('click', function() {
     pendingImport = null;
     el('import-confirm').classList.remove('visible');
   });
+
+  // ─── PWA Install ─────────────────────────────────────────────────────────────
+
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    el('install-banner').classList.add('visible');
+  });
+
+  el('install-btn').addEventListener('click', async function() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    el('install-banner').classList.remove('visible');
+  });
+
+  el('install-close').addEventListener('click', function() {
+    el('install-banner').classList.remove('visible');
+  });
+
+  // ─── Service Worker ──────────────────────────────────────────────────────────
+
+  if ('serviceWorker' in navigator) {
+    var swCode = 'const CACHE="energy-diary-v1";'
+      + 'self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll([self.location.pathname])));self.skipWaiting();});'
+      + 'self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim();});'
+      + 'self.addEventListener("fetch",e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));});';
+    var swBlob = new Blob([swCode], { type: 'application/javascript' });
+    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(function(){});
+  }
 
   // ─── Init ────────────────────────────────────────────────────────────────────
   renderAll();
