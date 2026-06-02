@@ -390,25 +390,32 @@
       color: var(--green);
     }
 
-    #view-add select {
-      width: 100%;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      padding: 13px 14px;
-      color: var(--text);
-      font-family: var(--body);
-      font-size: 14px;
-      cursor: pointer;
-      -webkit-appearance: none;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.3)' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
+    /* ACTIVITY PICKER */
+    .activity-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
     }
 
-    #view-add select:focus { outline: none; border-color: rgba(163,196,160,0.4); }
-    #view-add select option { background: #1a1a20; }
+    .activity-pill {
+      padding: 7px 13px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 20px;
+      color: rgba(255,255,255,0.45);
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+
+    .activity-pill.selected {
+      background: rgba(163,196,160,0.15);
+      border-color: var(--green);
+      color: var(--green);
+    }
 
     .energy-dots {
       display: flex;
@@ -479,6 +486,141 @@
 
     .submit-btn.ready:hover { filter: brightness(1.1); }
     .submit-btn.saved { background: var(--green-bright); color: #fff; }
+
+    /* PATTERNS VIEW */
+    .patterns-header {
+      margin-bottom: 24px;
+    }
+
+    .patterns-scope {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .scope-btn {
+      padding: 6px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      color: rgba(255,255,255,0.35);
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.18s;
+    }
+
+    .scope-btn.active {
+      background: rgba(163,196,160,0.12);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .pattern-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 10px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .pattern-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .pattern-name {
+      font-family: var(--serif);
+      font-size: 15px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .pattern-avg {
+      font-family: var(--mono);
+      font-size: 18px;
+      font-weight: 400;
+      flex-shrink: 0;
+    }
+
+    .pattern-bar-wrap {
+      height: 5px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 3px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .pattern-bar {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.6s ease;
+    }
+
+    .pattern-meta {
+      display: flex;
+      gap: 16px;
+    }
+
+    .pattern-meta-item {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.5px;
+    }
+
+    .pattern-meta-item span {
+      color: rgba(255,255,255,0.55);
+    }
+
+    .patterns-empty {
+      text-align: center;
+      padding: 56px 0;
+      color: rgba(255,255,255,0.18);
+      font-style: italic;
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .patterns-summary {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 0;
+    }
+
+    .summary-stat {
+      flex: 1;
+      text-align: center;
+    }
+
+    .summary-stat + .summary-stat {
+      border-left: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .summary-stat-value {
+      font-family: var(--serif);
+      font-size: 22px;
+      color: var(--text);
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .summary-stat-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: rgba(255,255,255,0.28);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
     /* DATA ACTIONS */
     .data-actions {
@@ -605,7 +747,8 @@
 
   <!-- Tabs -->
   <div class="tabs">
-    <button class="tab active" data-tab="log">Today's Log</button>
+    <button class="tab active" data-tab="log">Log</button>
+    <button class="tab" data-tab="patterns">Patterns</button>
     <button class="tab" data-tab="add">+ New Entry</button>
   </div>
 
@@ -615,7 +758,7 @@
     <div id="entries-list"></div>
 
     <!-- Export / Import -->
-    <div class="data-actions" id="data-actions" style="display:none">
+    <div class="data-actions" id="data-actions">
       <button class="data-btn export" id="export-btn">
         <span class="btn-icon">↓</span>Export JSON
       </button>
@@ -635,6 +778,17 @@
     <input type="file" id="file-input" accept=".json" style="display:none"/>
   </div>
 
+  <!-- PATTERNS VIEW -->
+  <div class="view" id="view-patterns">
+    <div class="patterns-scope">
+      <button class="scope-btn active" data-scope="7">7 days</button>
+      <button class="scope-btn" data-scope="30">30 days</button>
+      <button class="scope-btn" data-scope="all">All time</button>
+    </div>
+    <div id="patterns-summary"></div>
+    <div id="patterns-list"></div>
+  </div>
+
   <!-- ADD VIEW -->
   <div class="view" id="view-add">
 
@@ -649,19 +803,7 @@
 
     <div class="field">
       <label class="field-label">Activity</label>
-      <select id="activity-select">
-        <option>Deep work / analysis</option>
-        <option>Meeting</option>
-        <option>Presenting</option>
-        <option>Mentoring / teaching</option>
-        <option>Admin / email</option>
-        <option>Creative thinking</option>
-        <option>Collaboration</option>
-        <option>Strategy / planning</option>
-        <option>Client interaction</option>
-        <option>One-to-one conversation</option>
-        <option>Other</option>
-      </select>
+      <div class="activity-picker" id="activity-picker"></div>
     </div>
 
     <div class="field">
@@ -695,7 +837,13 @@
     { v: 5, label: 'Alive',     color: '#1abc9c' },
   ];
 
-  const TODAY_KEY = new Date().toDateString();
+  const ACTIVITIES = [
+    'Deep work / analysis', 'Meeting', 'Presenting', 'Mentoring / teaching',
+    'Admin / email', 'Creative thinking', 'Collaboration', 'Strategy / planning',
+    'Client interaction', 'One-to-one conversation', 'Other'
+  ];
+
+  let selectedActivity = ACTIVITIES[0];
   const TODAY_LABEL = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
 
   let entries = [];
@@ -741,7 +889,18 @@
   function el(id) { return document.getElementById(id); }
   function energyInfo(v) { return ENERGY.find(e => e.v === v); }
 
-  // ─── Render ─────────────────────────────────────────────────────────────────
+  function renderActivityPicker() {
+    const picker = el('activity-picker');
+    picker.innerHTML = ACTIVITIES.map(a => `
+      <button class="activity-pill ${a === selectedActivity ? 'selected' : ''}"
+        onclick="selectActivity('${a.replace(/'/g, "\\'")}')">${a}</button>
+    `).join('');
+  }
+
+  window.selectActivity = function(a) {
+    selectedActivity = a;
+    renderActivityPicker();
+  };
 
   function renderHeader() {
     el('date-heading').textContent = dateLabel(viewDate);
@@ -851,8 +1010,10 @@
     renderHeader();
     renderInsights();
     renderEntries();
+    renderPatterns();
     renderDataActions();
     renderTabs();
+    renderActivityPicker();
     renderDots('dots-before', selectedBefore, 'setBefore');
     renderDots('dots-after', selectedAfter, 'setAfter');
     updateSubmit();
@@ -893,7 +1054,7 @@
       dateKey: TODAY_KEY,
       date: TODAY_LABEL,
       time: selectedTime,
-      activity: el('activity-select').value,
+      activity: selectedActivity,
       before: selectedBefore,
       after: selectedAfter,
       note: el('note-input').value.trim(),
@@ -931,7 +1092,10 @@
     const addTab = document.querySelector('.tab[data-tab="add"]');
     const viewing = isToday(viewDate);
     addTab.style.display = viewing ? '' : 'none';
-    if (!viewing) switchTab('log');
+    if (!viewing) {
+      const currentTab = document.querySelector('.tab.active');
+      if (currentTab && currentTab.dataset.tab === 'add') switchTab('log');
+    }
   }
 
   document.querySelectorAll('.tab').forEach(btn => {
@@ -996,11 +1160,112 @@
     navigator.serviceWorker.register(swURL).catch(() => {});
   }
 
+  // ─── Patterns ────────────────────────────────────────────────────────────────
+
+  let patternsScope = 7;
+
+  function entriesInScope() {
+    if (patternsScope === 'all') return entries;
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - patternsScope);
+    cutoff.setHours(0, 0, 0, 0);
+    return entries.filter(e => new Date(e.id) >= cutoff);
+  }
+
+  function renderPatterns() {
+    const scoped = entriesInScope();
+    const summaryEl = el('patterns-summary');
+    const listEl = el('patterns-list');
+
+    if (scoped.length === 0) {
+      summaryEl.innerHTML = '';
+      listEl.innerHTML = `<div class="patterns-empty">Not enough data yet —<br>keep logging for a few days.</div>`;
+      return;
+    }
+
+    // Group by activity
+    const grouped = {};
+    scoped.forEach(e => {
+      if (!grouped[e.activity]) grouped[e.activity] = [];
+      grouped[e.activity].push(e);
+    });
+
+    // Build stats per activity
+    const stats = Object.entries(grouped).map(([name, es]) => {
+      const avgDelta = es.reduce((s, e) => s + (e.after - e.before), 0) / es.length;
+      const avgAfter = es.reduce((s, e) => s + e.after, 0) / es.length;
+      return { name, count: es.length, avgDelta, avgAfter };
+    }).sort((a, b) => b.avgDelta - a.avgDelta);
+
+    // Overall summary stats
+    const totalDays = new Set(scoped.map(e => e.dateKey)).size;
+    const overallAvgAfter = (scoped.reduce((s, e) => s + e.after, 0) / scoped.length).toFixed(1);
+    const topGiver = stats[0];
+    const topDrainer = stats[stats.length - 1];
+
+    summaryEl.innerHTML = `
+      <div class="patterns-summary">
+        <div class="summary-stat">
+          <span class="summary-stat-value">${scoped.length}</span>
+          <span class="summary-stat-label">Entries</span>
+        </div>
+        <div class="summary-stat">
+          <span class="summary-stat-value">${totalDays}</span>
+          <span class="summary-stat-label">Days</span>
+        </div>
+        <div class="summary-stat">
+          <span class="summary-stat-value">${overallAvgAfter}<span style="font-size:12px;color:rgba(255,255,255,0.3)">/5</span></span>
+          <span class="summary-stat-label">Avg Energy</span>
+        </div>
+      </div>`;
+
+    // Max absolute delta for bar scaling
+    const maxAbs = Math.max(...stats.map(s => Math.abs(s.avgDelta)), 1);
+
+    listEl.innerHTML = stats.map(s => {
+      const isPositive = s.avgDelta >= 0;
+      const color = s.avgDelta > 0.3 ? '#2ecc71'
+                  : s.avgDelta < -0.3 ? '#e74c3c'
+                  : '#f1c40f';
+      const barWidth = Math.round((Math.abs(s.avgDelta) / maxAbs) * 100);
+      const deltaStr = s.avgDelta > 0 ? `+${s.avgDelta.toFixed(1)}` : s.avgDelta.toFixed(1);
+
+      return `
+        <div class="pattern-card">
+          <div class="pattern-top">
+            <span class="pattern-name">${s.name}</span>
+            <span class="pattern-avg" style="color:${color}">${deltaStr}</span>
+          </div>
+          <div class="pattern-bar-wrap">
+            <div class="pattern-bar" style="width:${barWidth}%;background:${color}"></div>
+          </div>
+          <div class="pattern-meta">
+            <span class="pattern-meta-item">Logged <span>${s.count}×</span></span>
+            <span class="pattern-meta-item">Avg after <span>${s.avgAfter.toFixed(1)}/5</span></span>
+            <span class="pattern-meta-item" style="color:${color}">${s.avgDelta > 0.3 ? '↑ Giver' : s.avgDelta < -0.3 ? '↓ Drainer' : '→ Neutral'}</span>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  document.querySelectorAll('.scope-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      patternsScope = btn.dataset.scope === 'all' ? 'all' : parseInt(btn.dataset.scope);
+      document.querySelectorAll('.scope-btn').forEach(b => b.classList.toggle('active', b === btn));
+      renderPatterns();
+    });
+  });
+
   // ─── Export / Import ─────────────────────────────────────────────────────────
 
   function renderDataActions() {
     const actionsEl = el('data-actions');
-    actionsEl.style.display = entries.length > 0 ? 'flex' : 'none';
+    actionsEl.style.display = 'flex';
+    const exportBtn = el('export-btn');
+    const hasEntries = entries.length > 0;
+    exportBtn.disabled = !hasEntries;
+    exportBtn.style.opacity = hasEntries ? '1' : '0.3';
+    exportBtn.style.cursor = hasEntries ? 'pointer' : 'not-allowed';
   }
 
   // Export
