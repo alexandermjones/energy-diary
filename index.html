@@ -119,6 +119,56 @@
       margin-bottom: 28px;
     }
 
+    /* DAY NAVIGATOR */
+    .day-nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .nav-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 8px;
+      color: rgba(255,255,255,0.4);
+      cursor: pointer;
+      font-size: 16px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .nav-btn:hover:not(:disabled) { border-color: var(--green); color: var(--green); }
+    .nav-btn:disabled { opacity: 0.2; cursor: default; }
+
+    .nav-date {
+      flex: 1;
+      text-align: center;
+    }
+
+    .nav-date-label {
+      font-family: var(--serif);
+      font-size: clamp(15px, 4vw, 18px);
+      color: var(--text);
+      display: block;
+      line-height: 1.2;
+    }
+
+    .nav-today-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-top: 3px;
+    }
+
     /* TABS */
     .tabs {
       display: flex;
@@ -147,8 +197,8 @@
     }
 
     /* VIEWS */
-    .view { display: none; }
-    .view.active { display: block; }
+    .view { display: none; visibility: hidden; position: absolute; pointer-events: none; }
+    .view.active { display: block; visibility: visible; position: static; pointer-events: auto; }
 
     /* INSIGHTS */
     .insights {
@@ -340,7 +390,7 @@
       color: var(--green);
     }
 
-    select {
+    #view-add select {
       width: 100%;
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1);
@@ -357,8 +407,8 @@
       background-position: right 14px center;
     }
 
-    select:focus { outline: none; border-color: rgba(163,196,160,0.4); }
-    select option { background: #1a1a20; }
+    #view-add select:focus { outline: none; border-color: rgba(163,196,160,0.4); }
+    #view-add select option { background: #1a1a20; }
 
     .energy-dots {
       display: flex;
@@ -533,7 +583,17 @@
 
   <!-- Header -->
   <div class="eyebrow">Energy Diary</div>
-  <h1 id="date-heading"></h1>
+
+  <!-- Day Navigator -->
+  <div class="day-nav">
+    <button class="nav-btn" id="nav-prev" title="Previous day">&#8592;</button>
+    <div class="nav-date">
+      <span class="nav-date-label" id="date-heading"></span>
+      <span class="nav-today-badge" id="today-badge" style="display:none">Today</span>
+    </div>
+    <button class="nav-btn" id="nav-next" title="Next day" disabled>&#8594;</button>
+  </div>
+
   <p class="subtitle" id="subtitle">Log your first entry for today</p>
 
   <!-- Install Banner -->
@@ -642,6 +702,7 @@
   let selectedTime = 'Morning';
   let selectedBefore = null;
   let selectedAfter = null;
+  let viewDate = new Date(); // the day currently being viewed
 
   try { entries = JSON.parse(localStorage.getItem('energy-diary') || '[]'); } catch {}
 
@@ -649,25 +710,61 @@
 
   function save() { localStorage.setItem('energy-diary', JSON.stringify(entries)); }
 
+  function dateKey(d) { return d.toDateString(); }
+  function dateLabel(d) { return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }); }
+  function isToday(d) { return dateKey(d) === TODAY_KEY; }
+
+  function viewEntries() { return entries.filter(e => e.dateKey === dateKey(viewDate)); }
   function todayEntries() { return entries.filter(e => e.dateKey === TODAY_KEY); }
 
-  function el(id) { return document.getElementById(id); }
+  // Get all unique days that have entries, sorted newest first
+  function daysWithEntries() {
+    const keys = [...new Set(entries.map(e => e.dateKey))];
+    return keys.map(k => new Date(k)).sort((a, b) => b - a);
+  }
 
+  // Step viewDate to prev/next day that has entries (or today for next)
+  function stepDay(dir) {
+    const days = daysWithEntries();
+    // Always include today even if no entries
+    if (!days.find(d => dateKey(d) === TODAY_KEY)) days.unshift(new Date());
+    days.sort((a, b) => b - a);
+
+    const cur = dateKey(viewDate);
+    const idx = days.findIndex(d => dateKey(d) === cur);
+
+    if (dir === -1 && idx < days.length - 1) { viewDate = days[idx + 1]; }
+    else if (dir === 1 && idx > 0) { viewDate = days[idx - 1]; }
+    renderAll();
+  }
+
+  function el(id) { return document.getElementById(id); }
   function energyInfo(v) { return ENERGY.find(e => e.v === v); }
 
   // ─── Render ─────────────────────────────────────────────────────────────────
 
   function renderHeader() {
-    el('date-heading').textContent = TODAY_LABEL;
-    const count = todayEntries().length;
+    el('date-heading').textContent = dateLabel(viewDate);
+    const todayViewing = isToday(viewDate);
+    el('today-badge').style.display = todayViewing ? 'inline-block' : 'none';
+
+    const count = viewEntries().length;
     el('subtitle').textContent = count === 0
-      ? 'Log your first entry for today'
+      ? (todayViewing ? 'Log your first entry for today' : 'No entries for this day')
       : `${count} entr${count === 1 ? 'y' : 'ies'} logged`;
+
+    // Nav buttons
+    const days = daysWithEntries();
+    if (!days.find(d => dateKey(d) === TODAY_KEY)) days.unshift(new Date());
+    days.sort((a, b) => b - a);
+    const idx = days.findIndex(d => dateKey(d) === dateKey(viewDate));
+    el('nav-prev').disabled = idx >= days.length - 1;
+    el('nav-next').disabled = idx <= 0;
   }
 
   function renderInsights() {
     const panel = el('insights-panel');
-    const te = todayEntries();
+    const te = viewEntries();
     if (te.length < 2) { panel.innerHTML = ''; return; }
 
     const avg = (te.reduce((s, e) => s + e.after, 0) / te.length).toFixed(1);
@@ -700,9 +797,10 @@
 
   function renderEntries() {
     const list = el('entries-list');
-    const te = todayEntries();
+    const te = viewEntries();
+    const isPast = !isToday(viewDate);
     if (te.length === 0) {
-      list.innerHTML = `<div class="empty-state">Nothing logged yet —<br>your energy story starts now.</div>`;
+      list.innerHTML = `<div class="empty-state">${isPast ? 'No entries were logged<br>on this day.' : 'Nothing logged yet —<br>your energy story starts now.'}</div>`;
       return;
     }
     list.innerHTML = te.map(e => {
@@ -718,7 +816,7 @@
               <span class="entry-activity">${e.activity}</span>
               <span class="entry-time-badge">${e.time}</span>
             </div>
-            <button class="delete-btn" onclick="deleteEntry(${e.id})">×</button>
+            <button class="delete-btn" onclick="deleteEntry(${e.id})" title="Delete entry">×</button>
           </div>
           <div class="energy-row">
             <span class="energy-pill" style="color:${b.color};background:${b.color}22">${b.label}</span>
@@ -754,6 +852,7 @@
     renderInsights();
     renderEntries();
     renderDataActions();
+    renderTabs();
     renderDots('dots-before', selectedBefore, 'setBefore');
     renderDots('dots-after', selectedAfter, 'setAfter');
     updateSubmit();
@@ -810,16 +909,29 @@
       selectedBefore = null;
       selectedAfter = null;
       el('note-input').value = '';
+      viewDate = new Date();
       switchTab('log');
       renderAll();
     }, 800);
   });
+
+  // ─── Day Navigation ──────────────────────────────────────────────────────────
+
+  el('nav-prev').addEventListener('click', () => stepDay(-1));
+  el('nav-next').addEventListener('click', () => stepDay(1));
 
   // ─── Tabs ────────────────────────────────────────────────────────────────────
 
   function switchTab(name) {
     document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+  }
+
+  function renderTabs() {
+    const addTab = document.querySelector('.tab[data-tab="add"]');
+    const viewing = isToday(viewDate);
+    addTab.style.display = viewing ? '' : 'none';
+    if (!viewing) switchTab('log');
   }
 
   document.querySelectorAll('.tab').forEach(btn => {
