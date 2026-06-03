@@ -10,35 +10,10 @@
   <meta name="description" content="Track your energy through the working day"/>
   <title>Energy Diary</title>
 
-  <!-- Inline PWA Manifest -->
   <script>
-    const manifest = {
-      name: "Energy Diary",
-      short_name: "Energy",
-      description: "Track your energy through the working day",
-      start_url: ".",
-      display: "standalone",
-      background_color: "#0d1210",
-      theme_color: "#0d1210",
-      orientation: "portrait",
-      icons: [
-        {
-          src: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMTkyIDE5MiI+CiAgPHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSIzMiIgZmlsbD0iIzBkMTIxMCIvPgogIDx0ZXh0IHg9Ijk2IiB5PSIxMzAiIGZvbnQtZmFtaWx5PSJzZXJpZiIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNhM2M0YTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPuKaoTwvdGV4dD4KPC9zdmc+",
-          sizes: "192x192",
-          type: "image/svg+xml",
-          purpose: "any maskable"
-        },
-        {
-          src: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+CiAgPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSI4MCIgZmlsbD0iIzBkMTIxMCIvPgogIDx0ZXh0IHg9IjI1NiIgeT0iMzUwIiBmb250LWZhbWlseT0ic2VyaWYiIGZvbnQtc2l6ZT0iMjgwIiBmaWxsPSIjYTNjNGEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7imqE8L3RleHQ+Cjwvc3ZnPg==",
-          sizes: "512x512",
-          type: "image/svg+xml",
-          purpose: "any maskable"
-        }
-      ]
-    };
-    const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-    const manifestURL = URL.createObjectURL(blob);
-    document.write('<link rel="manifest" href="' + manifestURL + '">');
+    // Inline PWA manifest (avoids needing a separate manifest.json file)
+    var m = {name:"Energy Diary",short_name:"Energy",start_url:".",display:"standalone",background_color:"#0d1210",theme_color:"#0d1210",orientation:"portrait",icons:[{src:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMTkyIDE5MiI+CiAgPHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSIzMiIgZmlsbD0iIzBkMTIxMCIvPgogIDx0ZXh0IHg9Ijk2IiB5PSIxMzAiIGZvbnQtZmFtaWx5PSJzZXJpZiIgZm9udC1zaXplPSIxMDAiIGZpbGw9IiNhM2M0YTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPuKaoTwvdGV4dD4KPC9zdmc+",sizes:"192x192",type:"image/svg+xml",purpose:"any maskable"},{src:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+CiAgPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSI4MCIgZmlsbD0iIzBkMTIxMCIvPgogIDx0ZXh0IHg9IjI1NiIgeT0iMzUwIiBmb250LWZhbWlseT0ic2VyaWYiIGZvbnQtc2l6ZT0iMjgwIiBmaWxsPSIjYTNjNGEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7imqE8L3RleHQ+Cjwvc3ZnPg==",sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]};
+    document.write('<link rel="manifest" href="'+URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'}))+'">');
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -46,36 +21,24 @@
 
   <style>
     :root {
-      --bg: #0d0d10;
-      --bg2: #12111a;
-      --bg3: #0d1210;
-      --text: #e8e0d0;
+      --text:  #e8e0d0;
       --muted: rgba(255,255,255,0.3);
-      --subtle: rgba(255,255,255,0.08);
+      --subtle:rgba(255,255,255,0.08);
       --green: #a3c4a0;
-      --green-bright: #2ecc71;
-      --red: #e74c3c;
-      --gold: #f1c40f;
-      --orange: #e67e22;
       --serif: 'Playfair Display', Georgia, serif;
-      --body: 'Lora', Georgia, serif;
-      --mono: 'DM Mono', 'Courier New', monospace;
+      --body:  'Lora', Georgia, serif;
+      --mono:  'DM Mono', 'Courier New', monospace;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
       height: 100%;
-      background: var(--bg);
       color: var(--text);
       font-family: var(--body);
       -webkit-font-smoothing: antialiased;
       overscroll-behavior: none;
-    }
-
-    body {
       background: linear-gradient(135deg, #0d0d10 0%, #12111a 50%, #0d1210 100%);
-      min-height: 100vh;
       min-height: 100dvh;
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
@@ -90,10 +53,10 @@
       animation: fadeIn 0.5s ease;
     }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-    @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.22); } 100% { transform: scale(1.18); } }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+    @keyframes pop    { 0% { transform:scale(1); } 50% { transform:scale(1.22); } 100% { transform:scale(1.18); } }
 
-    /* HEADER */
+    /* ── HEADER ── */
     .eyebrow {
       font-family: var(--mono);
       font-size: 11px;
@@ -103,15 +66,6 @@
       margin-bottom: 6px;
     }
 
-    h1 {
-      font-family: var(--serif);
-      font-size: clamp(24px, 6vw, 32px);
-      font-weight: 400;
-      color: var(--text);
-      line-height: 1.2;
-      margin-bottom: 4px;
-    }
-
     .subtitle {
       font-size: 13px;
       color: var(--muted);
@@ -119,7 +73,7 @@
       margin-bottom: 28px;
     }
 
-    /* DAY NAVIGATOR */
+    /* ── DAY NAVIGATOR ── */
     .day-nav {
       display: flex;
       align-items: center;
@@ -142,15 +96,10 @@
       transition: all 0.2s;
       flex-shrink: 0;
     }
-
     .nav-btn:hover:not(:disabled) { border-color: var(--green); color: var(--green); }
     .nav-btn:disabled { opacity: 0.2; cursor: default; }
 
-    .nav-date {
-      flex: 1;
-      text-align: center;
-    }
-
+    .nav-date { flex: 1; text-align: center; }
     .nav-date-label {
       font-family: var(--serif);
       font-size: clamp(15px, 4vw, 18px);
@@ -158,24 +107,22 @@
       display: block;
       line-height: 1.2;
     }
-
     .nav-today-badge {
-      display: inline-block;
       font-family: var(--mono);
       font-size: 9px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       color: var(--green);
       margin-top: 3px;
+      display: none;
     }
 
-    /* TABS */
+    /* ── TABS ── */
     .tabs {
       display: flex;
       border-bottom: 1px solid var(--subtle);
       margin-bottom: 28px;
     }
-
     .tab {
       background: none;
       border: none;
@@ -190,495 +137,13 @@
       transition: all 0.2s;
       margin-bottom: -1px;
     }
+    .tab.active { color: var(--green); border-bottom-color: var(--green); }
 
-    .tab.active {
-      color: var(--green);
-      border-bottom-color: var(--green);
-    }
-
-    /* VIEWS */
+    /* ── VIEWS ── */
     .view { display: none; }
     .view.active { display: block; }
 
-    /* INSIGHTS */
-    .insights {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--subtle);
-      border-radius: 14px;
-      padding: 20px 22px;
-      margin-bottom: 24px;
-    }
-
-    .insights-title {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: rgba(255,255,255,0.4);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 16px;
-      font-weight: 400;
-    }
-
-    .insights-grid {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .insight-item {
-      flex: 1;
-      min-width: 100px;
-    }
-
-    .insight-item + .insight-item {
-      border-left: 1px solid rgba(255,255,255,0.07);
-      padding-left: 16px;
-    }
-
-    .insight-label {
-      font-size: 10px;
-      color: rgba(255,255,255,0.3);
-      font-family: var(--mono);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 4px;
-    }
-
-    .insight-label.green { color: var(--green-bright); }
-    .insight-label.red { color: var(--red); }
-
-    .insight-value {
-      font-family: var(--serif);
-      font-size: 26px;
-      color: var(--text);
-    }
-
-    .insight-value span { font-size: 13px; color: rgba(255,255,255,0.3); }
-
-    .insight-value-sm {
-      font-family: var(--serif);
-      font-size: 14px;
-      color: var(--text);
-    }
-
-    /* ENTRY CARD */
-    .entry-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 14px;
-      padding: 16px 20px;
-      margin-bottom: 10px;
-      transition: background 0.2s;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .entry-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 10px;
-    }
-
-    .entry-activity {
-      font-family: var(--serif);
-      font-size: 15px;
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .entry-time-badge {
-      font-size: 10px;
-      color: rgba(255,255,255,0.3);
-      font-family: var(--mono);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-left: 8px;
-    }
-
-    .delete-btn {
-      background: none;
-      border: none;
-      color: rgba(255,255,255,0.18);
-      cursor: pointer;
-      font-size: 18px;
-      line-height: 1;
-      padding: 0 4px;
-      transition: color 0.2s;
-      flex-shrink: 0;
-    }
-
-    .delete-btn:hover { color: var(--red); }
-
-    .energy-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .energy-pill {
-      font-size: 11px;
-      font-family: var(--mono);
-      padding: 3px 9px;
-      border-radius: 6px;
-    }
-
-    .arrow { color: rgba(255,255,255,0.2); font-size: 13px; }
-
-    .delta {
-      margin-left: auto;
-      font-size: 13px;
-      font-family: var(--mono);
-    }
-
-    .entry-note {
-      margin-top: 10px;
-      font-size: 13px;
-      color: rgba(255,255,255,0.42);
-      font-style: italic;
-      line-height: 1.6;
-      border-left: 2px solid rgba(255,255,255,0.1);
-      padding-left: 10px;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 56px 0;
-      color: rgba(255,255,255,0.18);
-      font-style: italic;
-      font-size: 15px;
-      line-height: 1.8;
-    }
-
-    /* FORM */
-    .field { margin-bottom: 24px; }
-
-    .field-label {
-      display: block;
-      font-family: var(--mono);
-      font-size: 10px;
-      color: rgba(255,255,255,0.35);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    .field-label .optional { color: rgba(255,255,255,0.18); }
-
-    .btn-group {
-      display: flex;
-      gap: 8px;
-    }
-
-    .seg-btn {
-      flex: 1;
-      padding: 10px 4px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 8px;
-      color: rgba(255,255,255,0.4);
-      cursor: pointer;
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.5px;
-      transition: all 0.2s;
-      text-align: center;
-    }
-
-    .seg-btn.selected {
-      background: rgba(163,196,160,0.15);
-      border-color: var(--green);
-      color: var(--green);
-    }
-
-    /* ACTIVITY PICKER */
-    .activity-picker {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-    }
-
-    .activity-pill {
-      padding: 7px 13px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 20px;
-      color: rgba(255,255,255,0.45);
-      cursor: pointer;
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.5px;
-      transition: all 0.18s;
-      white-space: nowrap;
-    }
-
-    .activity-pill.selected {
-      background: rgba(163,196,160,0.15);
-      border-color: var(--green);
-      color: var(--green);
-    }
-
-    .energy-dots {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .dot-wrap { text-align: center; }
-
-    .energy-dot {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      border: 2px solid transparent;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: block;
-      margin: 0 auto 5px;
-    }
-
-    .energy-dot.selected { animation: pop 0.2s ease forwards; }
-
-    .dot-label {
-      font-size: 8px;
-      color: rgba(255,255,255,0.22);
-      font-family: var(--mono);
-    }
-
-    textarea {
-      width: 100%;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 10px;
-      padding: 13px 14px;
-      color: var(--text);
-      font-family: var(--body);
-      font-style: italic;
-      font-size: 14px;
-      resize: none;
-      line-height: 1.6;
-      transition: border-color 0.2s;
-    }
-
-    textarea:focus { outline: none; border-color: rgba(163,196,160,0.35); }
-    textarea::placeholder { color: rgba(255,255,255,0.2); }
-
-    .submit-btn {
-      width: 100%;
-      padding: 15px;
-      background: rgba(255,255,255,0.06);
-      border: none;
-      border-radius: 12px;
-      color: rgba(255,255,255,0.2);
-      font-family: var(--mono);
-      font-size: 12px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      cursor: not-allowed;
-      transition: all 0.25s ease;
-      font-weight: 500;
-    }
-
-    .submit-btn.ready {
-      background: var(--green);
-      color: #0d1210;
-      cursor: pointer;
-    }
-
-    .submit-btn.ready:hover { filter: brightness(1.1); }
-    .submit-btn.saved { background: var(--green-bright); color: #fff; }
-
-    /* PATTERNS VIEW */
-    .patterns-header {
-      margin-bottom: 24px;
-    }
-
-    .patterns-scope {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 20px;
-    }
-
-    .scope-btn {
-      padding: 6px 14px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 20px;
-      color: rgba(255,255,255,0.35);
-      cursor: pointer;
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      transition: all 0.18s;
-    }
-
-    .scope-btn.active {
-      background: rgba(163,196,160,0.12);
-      border-color: var(--green);
-      color: var(--green);
-    }
-
-    .pattern-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px;
-      padding: 16px 18px;
-      margin-bottom: 10px;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .pattern-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-
-    .pattern-name {
-      font-family: var(--serif);
-      font-size: 15px;
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .pattern-avg {
-      font-family: var(--mono);
-      font-size: 18px;
-      font-weight: 400;
-      flex-shrink: 0;
-    }
-
-    .pattern-bar-wrap {
-      height: 5px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 3px;
-      margin-bottom: 10px;
-      overflow: hidden;
-    }
-
-    .pattern-bar {
-      height: 100%;
-      border-radius: 3px;
-      transition: width 0.6s ease;
-    }
-
-    .pattern-meta {
-      display: flex;
-      gap: 16px;
-    }
-
-    .pattern-meta-item {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: rgba(255,255,255,0.3);
-      letter-spacing: 0.5px;
-    }
-
-    .pattern-meta-item span {
-      color: rgba(255,255,255,0.55);
-    }
-
-    .patterns-empty {
-      text-align: center;
-      padding: 56px 0;
-      color: rgba(255,255,255,0.18);
-      font-style: italic;
-      font-size: 15px;
-      line-height: 1.8;
-    }
-
-    .patterns-summary {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px;
-      padding: 18px 20px;
-      margin-bottom: 20px;
-      display: flex;
-      gap: 0;
-    }
-
-    .summary-stat {
-      flex: 1;
-      text-align: center;
-    }
-
-    .summary-stat + .summary-stat {
-      border-left: 1px solid rgba(255,255,255,0.07);
-    }
-
-    .summary-stat-value {
-      font-family: var(--serif);
-      font-size: 22px;
-      color: var(--text);
-      display: block;
-      margin-bottom: 3px;
-    }
-
-    .summary-stat-label {
-      font-family: var(--mono);
-      font-size: 9px;
-      color: rgba(255,255,255,0.28);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    /* DATA ACTIONS */
-    .data-actions {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 24px;
-    }
-
-    .data-btn {
-      flex: 1;
-      padding: 10px 8px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 10px;
-      color: rgba(255,255,255,0.45);
-      cursor: pointer;
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      transition: all 0.2s;
-      text-align: center;
-    }
-
-    .data-btn:hover { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); }
-    .data-btn.export:hover { border-color: var(--green); color: var(--green); }
-    .data-btn.import-btn:hover { border-color: #7fb3d3; color: #7fb3d3; }
-
-    .data-btn .btn-icon { display: block; font-size: 16px; margin-bottom: 4px; }
-
-    .import-confirm {
-      display: none;
-      background: rgba(127,179,211,0.08);
-      border: 1px solid rgba(127,179,211,0.25);
-      border-radius: 12px;
-      padding: 16px 18px;
-      margin-bottom: 20px;
-    }
-
-    .import-confirm.visible { display: block; }
-    .import-confirm p { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.6; margin-bottom: 12px; font-style: italic; }
-    .import-confirm p strong { color: #7fb3d3; font-style: normal; }
-
-    .import-confirm-btns { display: flex; gap: 8px; }
-
-    .confirm-yes {
-      flex: 1; padding: 9px; background: #7fb3d3; border: none; border-radius: 8px;
-      color: #0d1210; font-family: var(--mono); font-size: 10px; letter-spacing: 1px;
-      text-transform: uppercase; cursor: pointer;
-    }
-
-    .confirm-no {
-      flex: 1; padding: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px; color: rgba(255,255,255,0.4); font-family: var(--mono); font-size: 10px;
-      letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
-    }
-
-    /* INSTALL BANNER */
+    /* ── INSTALL BANNER ── */
     .install-banner {
       display: none;
       background: rgba(163,196,160,0.1);
@@ -689,63 +154,198 @@
       align-items: center;
       gap: 12px;
     }
-
     .install-banner.visible { display: flex; }
-
     .install-text { flex: 1; font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.4; }
-    .install-text strong { color: var(--green); font-style: normal; }
-
+    .install-text strong { color: var(--green); }
     .install-btn {
-      background: var(--green);
-      color: #0d1210;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 14px;
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      cursor: pointer;
-      white-space: nowrap;
-      flex-shrink: 0;
+      background: var(--green); color: #0d1210; border: none; border-radius: 8px;
+      padding: 8px 14px; font-family: var(--mono); font-size: 10px;
+      letter-spacing: 1px; text-transform: uppercase; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    }
+    .install-close {
+      background: none; border: none; color: rgba(255,255,255,0.25);
+      cursor: pointer; font-size: 18px; flex-shrink: 0;
     }
 
-    .install-close {
-      background: none;
-      border: none;
-      color: rgba(255,255,255,0.25);
-      cursor: pointer;
-      font-size: 18px;
-      flex-shrink: 0;
+    /* ── INSIGHTS (log view summary bar) ── */
+    .insights {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--subtle);
+      border-radius: 14px;
+      padding: 20px 22px;
+      margin-bottom: 24px;
     }
+    .insights-title {
+      font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,0.4);
+      letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; font-weight: 400;
+    }
+    .insights-grid { display: flex; gap: 12px; flex-wrap: wrap; }
+    .insight-item { flex: 1; min-width: 100px; }
+    .insight-item + .insight-item { border-left: 1px solid rgba(255,255,255,0.07); padding-left: 16px; }
+    .insight-label { font-size: 10px; color: rgba(255,255,255,0.3); font-family: var(--mono); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .insight-label.green { color: #2ecc71; }
+    .insight-label.red   { color: #e74c3c; }
+    .insight-value    { font-family: var(--serif); font-size: 26px; color: var(--text); }
+    .insight-value span { font-size: 13px; color: rgba(255,255,255,0.3); }
+    .insight-value-sm { font-family: var(--serif); font-size: 14px; color: var(--text); }
+
+    /* ── ENTRY CARDS ── */
+    .entry-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 10px;
+      animation: fadeIn 0.3s ease;
+    }
+    .entry-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .entry-activity { font-family: var(--serif); font-size: 15px; color: var(--text); font-weight: 600; }
+    .entry-time-badge { font-size: 10px; color: rgba(255,255,255,0.3); font-family: var(--mono); text-transform: uppercase; letter-spacing: 1px; margin-left: 8px; }
+    .delete-btn { background: none; border: none; color: rgba(255,255,255,0.18); cursor: pointer; font-size: 18px; line-height: 1; padding: 0 4px; transition: color 0.2s; flex-shrink: 0; }
+    .delete-btn:hover { color: #e74c3c; }
+    .energy-row { display: flex; align-items: center; gap: 10px; }
+    .energy-pill { font-size: 11px; font-family: var(--mono); padding: 3px 9px; border-radius: 6px; }
+    .arrow { color: rgba(255,255,255,0.2); font-size: 13px; }
+    .delta { margin-left: auto; font-size: 13px; font-family: var(--mono); }
+    .entry-note { margin-top: 10px; font-size: 13px; color: rgba(255,255,255,0.42); font-style: italic; line-height: 1.6; border-left: 2px solid rgba(255,255,255,0.1); padding-left: 10px; }
+    .empty-state { text-align: center; padding: 56px 0; color: rgba(255,255,255,0.18); font-style: italic; font-size: 15px; line-height: 1.8; }
+
+    /* ── DATA ACTIONS (export/import) ── */
+    .data-actions { display: flex; gap: 8px; margin-top: 20px; }
+    .data-btn {
+      flex: 1; padding: 10px 8px; background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09); border-radius: 10px;
+      color: rgba(255,255,255,0.45); cursor: pointer; font-family: var(--mono);
+      font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+      transition: all 0.2s; text-align: center;
+    }
+    .data-btn:hover:not(:disabled) { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); }
+    .data-btn.export:hover:not(:disabled) { border-color: var(--green); color: var(--green); }
+    .data-btn .btn-icon { display: block; font-size: 16px; margin-bottom: 4px; }
+
+    .import-confirm {
+      display: none;
+      background: rgba(127,179,211,0.08);
+      border: 1px solid rgba(127,179,211,0.25);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-top: 12px;
+    }
+    .import-confirm.visible { display: block; }
+    .import-confirm p { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.6; margin-bottom: 12px; font-style: italic; }
+    .import-confirm-btns { display: flex; gap: 8px; }
+    .confirm-yes { flex:1; padding:9px; background:#7fb3d3; border:none; border-radius:8px; color:#0d1210; font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; cursor:pointer; }
+    .confirm-no  { flex:1; padding:9px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:rgba(255,255,255,0.4); font-family:var(--mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; cursor:pointer; }
+
+    /* ── PATTERNS VIEW ── */
+    .patterns-scope { display: flex; gap: 6px; margin-bottom: 20px; }
+    .scope-btn {
+      padding: 6px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px; color: rgba(255,255,255,0.35); cursor: pointer; font-family: var(--mono);
+      font-size: 10px; letter-spacing: 1px; text-transform: uppercase; transition: all 0.18s;
+    }
+    .scope-btn.active { background: rgba(163,196,160,0.12); border-color: var(--green); color: var(--green); }
+
+    .patterns-summary { display: flex; background: rgba(255,255,255,0.03); border: 1px solid var(--subtle); border-radius: 14px; padding: 18px 20px; margin-bottom: 20px; }
+    .summary-stat { flex: 1; text-align: center; }
+    .summary-stat + .summary-stat { border-left: 1px solid rgba(255,255,255,0.07); }
+    .summary-stat-value { font-family: var(--serif); font-size: 22px; color: var(--text); display: block; margin-bottom: 3px; }
+    .summary-stat-label { font-family: var(--mono); font-size: 9px; color: rgba(255,255,255,0.28); text-transform: uppercase; letter-spacing: 1px; }
+
+    .pattern-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px 18px; margin-bottom: 10px; }
+    .pattern-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .pattern-name { font-family: var(--serif); font-size: 15px; color: var(--text); font-weight: 600; }
+    .pattern-avg  { font-family: var(--mono); font-size: 18px; flex-shrink: 0; }
+    .pattern-bar-wrap { height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; margin-bottom: 10px; overflow: hidden; }
+    .pattern-bar  { height: 100%; border-radius: 3px; }
+    .pattern-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+    .pattern-meta-item { font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.3); }
+    .pattern-meta-item span { color: rgba(255,255,255,0.55); }
+    .patterns-empty { text-align: center; padding: 56px 0; color: rgba(255,255,255,0.18); font-style: italic; font-size: 15px; line-height: 1.8; }
+
+    /* ── ADD FORM ── */
+    .field { margin-bottom: 24px; }
+    .field-label { display: block; font-family: var(--mono); font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+    .field-label .optional { color: rgba(255,255,255,0.18); }
+
+    .btn-group { display: flex; gap: 8px; }
+    .seg-btn {
+      flex: 1; padding: 10px 4px; background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
+      color: rgba(255,255,255,0.4); cursor: pointer; font-family: var(--mono);
+      font-size: 10px; letter-spacing: 0.5px; transition: all 0.2s; text-align: center;
+    }
+    .seg-btn.selected { background: rgba(163,196,160,0.15); border-color: var(--green); color: var(--green); }
+
+    .activity-picker { display: flex; flex-wrap: wrap; gap: 7px; }
+    .activity-pill {
+      padding: 7px 13px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 20px; color: rgba(255,255,255,0.45); cursor: pointer; font-family: var(--mono);
+      font-size: 10px; letter-spacing: 0.5px; transition: all 0.18s; white-space: nowrap;
+    }
+    .activity-pill.selected { background: rgba(163,196,160,0.15); border-color: var(--green); color: var(--green); }
+
+    .energy-dots { display: flex; gap: 8px; align-items: center; }
+    .dot-wrap { text-align: center; }
+    .energy-dot {
+      width: 38px; height: 38px; border-radius: 50%; border: 2px solid transparent;
+      cursor: pointer; transition: all 0.2s ease; display: block; margin: 0 auto 5px;
+    }
+    .energy-dot.selected { animation: pop 0.2s ease forwards; }
+    .dot-label { font-size: 8px; color: rgba(255,255,255,0.22); font-family: var(--mono); }
+
+    /* contenteditable note field — no native widget, no bleed */
+    .note-field {
+      width: 100%; min-height: 52px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 10px;
+      padding: 13px 14px;
+      color: var(--text);
+      font-family: var(--body);
+      font-style: italic;
+      font-size: 14px;
+      line-height: 1.6;
+      outline: none;
+      transition: border-color 0.2s;
+      word-break: break-word;
+    }
+    .note-field:focus { border-color: rgba(163,196,160,0.35); }
+    .note-field:empty::before { content: attr(data-placeholder); color: rgba(255,255,255,0.2); pointer-events: none; }
+
+    .submit-btn {
+      width: 100%; padding: 15px; background: rgba(255,255,255,0.06); border: none;
+      border-radius: 12px; color: rgba(255,255,255,0.2); font-family: var(--mono);
+      font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+      cursor: not-allowed; transition: all 0.25s ease; font-weight: 500;
+    }
+    .submit-btn.ready { background: var(--green); color: #0d1210; cursor: pointer; }
+    .submit-btn.ready:hover { filter: brightness(1.1); }
+    .submit-btn.saved { background: #2ecc71; color: #fff; }
   </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- Header -->
   <div class="eyebrow">Energy Diary</div>
 
-  <!-- Day Navigator -->
   <div class="day-nav">
-    <button class="nav-btn" id="nav-prev" title="Previous day">&#8592;</button>
+    <button class="nav-btn" id="nav-prev">&#8592;</button>
     <div class="nav-date">
       <span class="nav-date-label" id="date-heading"></span>
-      <span class="nav-today-badge" id="today-badge" style="display:none">Today</span>
+      <span class="nav-today-badge" id="today-badge">Today</span>
     </div>
-    <button class="nav-btn" id="nav-next" title="Next day" disabled>&#8594;</button>
+    <button class="nav-btn" id="nav-next" disabled>&#8594;</button>
   </div>
 
-  <p class="subtitle" id="subtitle">Log your first entry for today</p>
+  <p class="subtitle" id="subtitle"></p>
 
-  <!-- Install Banner -->
   <div class="install-banner" id="install-banner">
     <div class="install-text"><strong>Add to Home Screen</strong><br>Install for quick daily access</div>
     <button class="install-btn" id="install-btn">Install</button>
-    <button class="install-close" id="install-close">×</button>
+    <button class="install-close" id="install-close">&#215;</button>
   </div>
 
-  <!-- Tabs -->
   <div class="tabs">
     <button class="tab active" data-tab="log">Log</button>
     <button class="tab" data-tab="patterns">Patterns</button>
@@ -756,26 +356,17 @@
   <div class="view active" id="view-log">
     <div id="insights-panel"></div>
     <div id="entries-list"></div>
-
-    <!-- Export / Import -->
-    <div class="data-actions" id="data-actions">
-      <button class="data-btn export" id="export-btn">
-        <span class="btn-icon">↓</span>Export JSON
-      </button>
-      <button class="data-btn import-btn" id="import-trigger-btn">
-        <span class="btn-icon">↑</span>Import JSON
-      </button>
+    <div class="data-actions">
+      <button class="data-btn export" id="export-btn"><span class="btn-icon">&#8595;</span>Export JSON</button>
+      <button class="data-btn" id="import-btn"><span class="btn-icon">&#8593;</span>Import JSON</button>
     </div>
-
     <div class="import-confirm" id="import-confirm">
-      <p id="import-confirm-msg">Loading…</p>
+      <p id="import-msg"></p>
       <div class="import-confirm-btns">
-        <button class="confirm-yes" id="confirm-yes-btn">Merge & Import</button>
-        <button class="confirm-no" id="confirm-no-btn">Cancel</button>
+        <button class="confirm-yes" id="confirm-yes">Merge &amp; Import</button>
+        <button class="confirm-no"  id="confirm-no">Cancel</button>
       </div>
     </div>
-
-    <input type="file" id="file-input" accept=".json" style="display:none"/>
   </div>
 
   <!-- PATTERNS VIEW -->
@@ -789,288 +380,239 @@
     <div id="patterns-list"></div>
   </div>
 
-  <!-- ADD VIEW -->
+  <!-- ADD VIEW — contains zero native form elements -->
   <div class="view" id="view-add">
-
     <div class="field">
       <label class="field-label">Time of Day</label>
-      <div class="btn-group" id="time-group">
+      <div class="btn-group">
         <button class="seg-btn selected" data-time="Morning">Morning</button>
         <button class="seg-btn" data-time="After Lunch">After Lunch</button>
         <button class="seg-btn" data-time="End of Day">End of Day</button>
       </div>
     </div>
-
     <div class="field">
       <label class="field-label">Activity</label>
       <div class="activity-picker" id="activity-picker"></div>
     </div>
-
     <div class="field">
       <label class="field-label">Energy Before</label>
       <div class="energy-dots" id="dots-before"></div>
     </div>
-
     <div class="field">
       <label class="field-label">Energy After</label>
       <div class="energy-dots" id="dots-after"></div>
     </div>
-
     <div class="field">
-          <label class="field-label">Note <span class="optional">(optional)</span></label>
-          <div id="note-placeholder"></div>
-        </div>
-
-        <button class="submit-btn" id="submit-btn">Log Entry</button>
-      </div>
-
-      <!-- Textarea lives outside any view so it can't bleed through on Android -->
-      <textarea id="note-input" rows="2" placeholder="What felt good or draining about this?"
-        style="display:none;width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:13px 14px;color:#e8e0d0;font-family:'Lora',Georgia,serif;font-style:italic;font-size:14px;resize:none;line-height:1.6;"></textarea>
+      <label class="field-label">Note <span class="optional">(optional)</span></label>
+      <div class="note-field" id="note-field" contenteditable="true" data-placeholder="What felt good or draining about this?"></div>
+    </div>
+    <button class="submit-btn" id="submit-btn">Log Entry</button>
+  </div>
 
 </div>
-
 <script>
-  // ─── Constants & State ───────────────────────────────────────────────────────
+  // ── Constants ────────────────────────────────────────────────────────────────
 
-  const ENERGY = [
-    { v: 1, label: 'Drained',   color: '#c0392b' },
-    { v: 2, label: 'Low',       color: '#e67e22' },
-    { v: 3, label: 'Neutral',   color: '#f1c40f' },
-    { v: 4, label: 'Energised', color: '#2ecc71' },
-    { v: 5, label: 'Alive',     color: '#1abc9c' },
+  var ENERGY = [
+    { v:1, label:'Drained',   color:'#c0392b' },
+    { v:2, label:'Low',       color:'#e67e22' },
+    { v:3, label:'Neutral',   color:'#f1c40f' },
+    { v:4, label:'Energised', color:'#2ecc71' },
+    { v:5, label:'Alive',     color:'#1abc9c' },
   ];
 
-  const ACTIVITIES = [
-    'Deep work / analysis', 'Meeting', 'Presenting', 'Mentoring / teaching',
-    'Admin / email', 'Creative thinking', 'Collaboration', 'Strategy / planning',
-    'Client interaction', 'One-to-one conversation', 'Other'
+  var ACTIVITIES = [
+    'Deep work / analysis','Meeting','Presenting','Mentoring / teaching',
+    'Admin / email','Creative thinking','Collaboration','Strategy / planning',
+    'Client interaction','One-to-one conversation','Other'
   ];
 
-  const TODAY_KEY   = new Date().toDateString();
-  const TODAY_LABEL = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+  var TODAY_KEY   = new Date().toDateString();
+  var TODAY_LABEL = fmt(new Date());
 
-  let entries         = [];
-  let viewDate        = new Date();
-  let selectedTime    = 'Morning';
-  let selectedBefore  = null;
-  let selectedAfter   = null;
-  let selectedActivity = ACTIVITIES[0];
-  let patternsScope   = 7;
-  let pendingImport   = null;
-  let deferredPrompt  = null;
+  // ── State ────────────────────────────────────────────────────────────────────
 
-  try { entries = JSON.parse(localStorage.getItem('energy-diary') || '[]'); } catch {}
+  var entries          = [];
+  var viewDate         = new Date();
+  var selectedTime     = 'Morning';
+  var selectedBefore   = null;
+  var selectedAfter    = null;
+  var selectedActivity = ACTIVITIES[0];
+  var patternsScope    = 7;
+  var pendingImport    = null;
+  var deferredPrompt   = null;
 
-  // ─── Utilities ───────────────────────────────────────────────────────────────
+  try { entries = JSON.parse(localStorage.getItem('energy-diary') || '[]'); } catch(e) {}
 
-  function el(id)         { return document.getElementById(id); }
-  function save()         { localStorage.setItem('energy-diary', JSON.stringify(entries)); }
-  function dateKey(d)     { return d.toDateString(); }
-  function dateLabel(d)   { return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }); }
-  function isToday(d)     { return dateKey(d) === TODAY_KEY; }
-  function energyInfo(v)  { return ENERGY.find(e => e.v === v); }
-  function viewEntries()  { return entries.filter(e => e.dateKey === dateKey(viewDate)); }
+  // ── Utilities ────────────────────────────────────────────────────────────────
+
+  function el(id)       { return document.getElementById(id); }
+  function save()       { localStorage.setItem('energy-diary', JSON.stringify(entries)); }
+  function key(d)       { return d.toDateString(); }
+  function fmt(d)       { return d.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' }); }
+  function isToday(d)   { return key(d) === TODAY_KEY; }
+  function eInfo(v)     { return ENERGY.find(function(e){ return e.v===v; }); }
+  function viewEntries(){ return entries.filter(function(e){ return e.dateKey===key(viewDate); }); }
 
   function daysWithEntries() {
-    const keys = [...new Set(entries.map(e => e.dateKey))];
-    return keys.map(k => new Date(k)).sort((a, b) => b - a);
+    var seen = {};
+    entries.forEach(function(e){ seen[e.dateKey]=true; });
+    return Object.keys(seen).map(function(k){ return new Date(k); }).sort(function(a,b){ return b-a; });
   }
 
   function stepDay(dir) {
-    const days = daysWithEntries();
-    if (!days.find(d => dateKey(d) === TODAY_KEY)) days.unshift(new Date());
-    days.sort((a, b) => b - a);
-    const idx = days.findIndex(d => dateKey(d) === dateKey(viewDate));
-    if (dir === -1 && idx < days.length - 1) viewDate = days[idx + 1];
-    else if (dir === 1 && idx > 0)           viewDate = days[idx - 1];
+    var days = daysWithEntries();
+    if (!days.find(function(d){ return key(d)===TODAY_KEY; })) days.unshift(new Date());
+    days.sort(function(a,b){ return b-a; });
+    var idx = days.findIndex(function(d){ return key(d)===key(viewDate); });
+    if (dir===-1 && idx < days.length-1) viewDate = days[idx+1];
+    else if (dir===1 && idx > 0)         viewDate = days[idx-1];
     renderAll();
   }
 
-  function switchTab(name) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
-    var textarea = el('note-input');
-    var placeholder = el('note-placeholder');
-    if (name === 'add' && placeholder) {
-      placeholder.appendChild(textarea);
-      textarea.style.display = 'block';
-    } else {
-      textarea.style.display = 'none';
-      document.body.appendChild(textarea);
-    }
-  }
-
-  // ─── Render ──────────────────────────────────────────────────────────────────
+  // ── Render ───────────────────────────────────────────────────────────────────
 
   function renderHeader() {
-    el('date-heading').textContent = dateLabel(viewDate);
-    const todayViewing = isToday(viewDate);
-    el('today-badge').style.display = todayViewing ? 'inline-block' : 'none';
-    const count = viewEntries().length;
+    el('date-heading').textContent = fmt(viewDate);
+    el('today-badge').style.display = isToday(viewDate) ? 'inline-block' : 'none';
+    var count = viewEntries().length;
     el('subtitle').textContent = count === 0
-      ? (todayViewing ? 'Log your first entry for today' : 'No entries for this day')
-      : count + ' entr' + (count === 1 ? 'y' : 'ies') + ' logged';
-    const days = daysWithEntries();
-    if (!days.find(d => dateKey(d) === TODAY_KEY)) days.unshift(new Date());
-    days.sort((a, b) => b - a);
-    const idx = days.findIndex(d => dateKey(d) === dateKey(viewDate));
-    el('nav-prev').disabled = idx >= days.length - 1;
+      ? (isToday(viewDate) ? 'Log your first entry for today' : 'No entries for this day')
+      : count + ' entr' + (count===1?'y':'ies') + ' logged';
+    var days = daysWithEntries();
+    if (!days.find(function(d){ return key(d)===TODAY_KEY; })) days.unshift(new Date());
+    days.sort(function(a,b){ return b-a; });
+    var idx = days.findIndex(function(d){ return key(d)===key(viewDate); });
+    el('nav-prev').disabled = idx >= days.length-1;
     el('nav-next').disabled = idx <= 0;
   }
 
   function renderTabs() {
-    const addTab = document.querySelector('.tab[data-tab="add"]');
-    const viewing = isToday(viewDate);
+    var addTab = document.querySelector('.tab[data-tab="add"]');
+    var viewing = isToday(viewDate);
     addTab.style.display = viewing ? '' : 'none';
     if (!viewing) {
-      const cur = document.querySelector('.tab.active');
+      var cur = document.querySelector('.tab.active');
       if (cur && cur.dataset.tab === 'add') switchTab('log');
     }
   }
 
   function renderInsights() {
-    const panel = el('insights-panel');
-    const te = viewEntries();
+    var panel = el('insights-panel');
+    var te = viewEntries();
     if (te.length < 2) { panel.innerHTML = ''; return; }
-    const avg = (te.reduce((s, e) => s + e.after, 0) / te.length).toFixed(1);
-    const givers   = te.filter(e => e.after > e.before).sort((a, b) => (b.after - b.before) - (a.after - a.before));
-    const drainers = te.filter(e => e.after < e.before).sort((a, b) => (a.after - a.before) - (b.after - b.before));
-    const giver   = givers[0];
-    const drainer = drainers[0];
-    var html = '<div class="insights"><div class="insights-title">Today\'s Patterns</div><div class="insights-grid">';
-    html += '<div class="insight-item"><div class="insight-label">Avg Energy After</div><div class="insight-value">' + avg + '<span>/5</span></div></div>';
-    if (giver)   html += '<div class="insight-item"><div class="insight-label green">&#8593; Energy Giver</div><div class="insight-value-sm">' + giver.activity + '</div></div>';
-    if (drainer) html += '<div class="insight-item"><div class="insight-label red">&#8595; Energy Drainer</div><div class="insight-value-sm">' + drainer.activity + '</div></div>';
-    html += '</div></div>';
-    panel.innerHTML = html;
+    var avg = (te.reduce(function(s,e){ return s+e.after; },0)/te.length).toFixed(1);
+    var givers   = te.filter(function(e){ return e.after>e.before; }).sort(function(a,b){ return (b.after-b.before)-(a.after-a.before); });
+    var drainers = te.filter(function(e){ return e.after<e.before; }).sort(function(a,b){ return (a.after-a.before)-(b.after-b.before); });
+    var h = '<div class="insights"><div class="insights-title">Today\'s Patterns</div><div class="insights-grid">';
+    h += '<div class="insight-item"><div class="insight-label">Avg Energy After</div><div class="insight-value">'+avg+'<span>/5</span></div></div>';
+    if (givers[0])   h += '<div class="insight-item"><div class="insight-label green">&#8593; Energy Giver</div><div class="insight-value-sm">'+givers[0].activity+'</div></div>';
+    if (drainers[0]) h += '<div class="insight-item"><div class="insight-label red">&#8595; Energy Drainer</div><div class="insight-value-sm">'+drainers[0].activity+'</div></div>';
+    h += '</div></div>';
+    panel.innerHTML = h;
   }
 
   function renderEntries() {
-    const list = el('entries-list');
-    const te = viewEntries();
-    const isPast = !isToday(viewDate);
+    var list = el('entries-list');
+    var te = viewEntries();
     if (te.length === 0) {
-      list.innerHTML = '<div class="empty-state">' + (isPast ? 'No entries were logged<br>on this day.' : 'Nothing logged yet —<br>your energy story starts now.') + '</div>';
+      list.innerHTML = '<div class="empty-state">'+(isToday(viewDate)?'Nothing logged yet —<br>your energy story starts now.':'No entries were logged<br>on this day.')+'</div>';
       return;
     }
     list.innerHTML = te.map(function(e) {
-      var b = energyInfo(e.before);
-      var a = energyInfo(e.after);
-      var delta = e.after - e.before;
-      var deltaStr = delta > 0 ? '+' + delta : delta === 0 ? '±0' : '' + delta;
-      var deltaColor = delta > 0 ? '#2ecc71' : delta < 0 ? '#e74c3c' : 'rgba(255,255,255,0.3)';
-      var html = '<div class="entry-card">'
-        + '<div class="entry-header"><div>'
-        + '<span class="entry-activity">' + e.activity + '</span>'
-        + '<span class="entry-time-badge">' + e.time + '</span>'
-        + '</div>'
-        + '<button class="delete-btn" data-id="' + e.id + '" title="Delete entry">&times;</button>'
-        + '</div>'
-        + '<div class="energy-row">'
-        + '<span class="energy-pill" style="color:' + b.color + ';background:' + b.color + '22">' + b.label + '</span>'
-        + '<span class="arrow">&#8594;</span>'
-        + '<span class="energy-pill" style="color:' + a.color + ';background:' + a.color + '22">' + a.label + '</span>'
-        + '<span class="delta" style="color:' + deltaColor + '">' + deltaStr + '</span>'
-        + '</div>';
-      if (e.note) html += '<div class="entry-note">' + e.note + '</div>';
-      html += '</div>';
-      return html;
+      var b = eInfo(e.before), a = eInfo(e.after), d = e.after-e.before;
+      var ds = d>0?'+'+d:d===0?'±0':''+d;
+      var dc = d>0?'#2ecc71':d<0?'#e74c3c':'rgba(255,255,255,0.3)';
+      return '<div class="entry-card">'
+        +'<div class="entry-header"><div>'
+        +'<span class="entry-activity">'+e.activity+'</span>'
+        +'<span class="entry-time-badge">'+e.time+'</span>'
+        +'</div><button class="delete-btn" data-id="'+e.id+'">&times;</button></div>'
+        +'<div class="energy-row">'
+        +'<span class="energy-pill" style="color:'+b.color+';background:'+b.color+'22">'+b.label+'</span>'
+        +'<span class="arrow">&#8594;</span>'
+        +'<span class="energy-pill" style="color:'+a.color+';background:'+a.color+'22">'+a.label+'</span>'
+        +'<span class="delta" style="color:'+dc+'">'+ds+'</span>'
+        +'</div>'
+        +(e.note?'<div class="entry-note">'+e.note+'</div>':'')
+        +'</div>';
     }).join('');
   }
 
-  function renderDots(containerId, selectedVal) {
-    var container = el(containerId);
-    container.innerHTML = ENERGY.map(function(lv) {
-      var isSel = selectedVal === lv.v;
-      var bg     = isSel ? lv.color : lv.color + '33';
-      var border = isSel ? lv.color : 'transparent';
-      var shadow = isSel ? '0 0 12px ' + lv.color + '88' : 'none';
-      var scale  = isSel ? 'scale(1.18)' : 'scale(1)';
+  function renderDots(cid, val) {
+    el(cid).innerHTML = ENERGY.map(function(lv) {
+      var s = val===lv.v;
       return '<div class="dot-wrap">'
-        + '<button class="energy-dot' + (isSel ? ' selected' : '') + '"'
-        + ' data-dotid="' + containerId + '"'
-        + ' data-v="' + lv.v + '"'
-        + ' style="background:' + bg + ';border-color:' + border + ';box-shadow:' + shadow + ';transform:' + scale + '">'
-        + '</button>'
-        + '<div class="dot-label">' + lv.label + '</div>'
-        + '</div>';
+        +'<button class="energy-dot'+(s?' selected':'')+'" data-dotid="'+cid+'" data-v="'+lv.v+'"'
+        +' style="background:'+(s?lv.color:lv.color+'33')+';border-color:'+(s?lv.color:'transparent')+';box-shadow:'+(s?'0 0 12px '+lv.color+'88':'none')+';transform:'+(s?'scale(1.18)':'scale(1)')+';">'
+        +'</button><div class="dot-label">'+lv.label+'</div></div>';
     }).join('');
   }
 
   function renderActivityPicker() {
-    var picker = el('activity-picker');
-    picker.innerHTML = ACTIVITIES.map(function(a) {
-      return '<button class="activity-pill' + (a === selectedActivity ? ' selected' : '') + '" data-activity="' + a + '">' + a + '</button>';
+    el('activity-picker').innerHTML = ACTIVITIES.map(function(a) {
+      return '<button class="activity-pill'+(a===selectedActivity?' selected':'')+'" data-activity="'+a+'">'+a+'</button>';
     }).join('');
   }
 
   function renderDataActions() {
-    var hasEntries = entries.length > 0;
-    var btn = el('export-btn');
-    btn.disabled = !hasEntries;
-    btn.style.opacity = hasEntries ? '1' : '0.3';
-    btn.style.cursor  = hasEntries ? 'pointer' : 'not-allowed';
+    var has = entries.length > 0;
+    el('export-btn').disabled = !has;
+    el('export-btn').style.opacity = has ? '1' : '0.3';
+    el('export-btn').style.cursor  = has ? 'pointer' : 'not-allowed';
   }
 
   function renderPatterns() {
     var scoped;
     if (patternsScope === 'all') {
-      scoped = entries;
+      scoped = entries.slice();
     } else {
-      var cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - patternsScope);
-      cutoff.setHours(0, 0, 0, 0);
-      scoped = entries.filter(function(e) { return new Date(e.id) >= cutoff; });
+      var cutoff = new Date(); cutoff.setDate(cutoff.getDate()-patternsScope); cutoff.setHours(0,0,0,0);
+      scoped = entries.filter(function(e){ return new Date(e.id)>=cutoff; });
     }
-    var summaryEl = el('patterns-summary');
-    var listEl    = el('patterns-list');
-    if (scoped.length === 0) {
-      summaryEl.innerHTML = '';
-      listEl.innerHTML = '<div class="patterns-empty">Not enough data yet —<br>keep logging for a few days.</div>';
+    var sEl = el('patterns-summary'), lEl = el('patterns-list');
+    if (!scoped.length) {
+      sEl.innerHTML = '';
+      lEl.innerHTML = '<div class="patterns-empty">Not enough data yet —<br>keep logging for a few days.</div>';
       return;
     }
     var grouped = {};
-    scoped.forEach(function(e) {
-      if (!grouped[e.activity]) grouped[e.activity] = [];
-      grouped[e.activity].push(e);
-    });
+    scoped.forEach(function(e){ if(!grouped[e.activity]) grouped[e.activity]=[]; grouped[e.activity].push(e); });
     var stats = Object.keys(grouped).map(function(name) {
       var es = grouped[name];
-      var avgDelta = es.reduce(function(s, e) { return s + (e.after - e.before); }, 0) / es.length;
-      var avgAfter = es.reduce(function(s, e) { return s + e.after; }, 0) / es.length;
-      return { name: name, count: es.length, avgDelta: avgDelta, avgAfter: avgAfter };
-    }).sort(function(a, b) { return b.avgDelta - a.avgDelta; });
-    var totalDays = new Set(scoped.map(function(e) { return e.dateKey; })).size;
-    var overallAvg = (scoped.reduce(function(s, e) { return s + e.after; }, 0) / scoped.length).toFixed(1);
-    summaryEl.innerHTML = '<div class="patterns-summary">'
-      + '<div class="summary-stat"><span class="summary-stat-value">' + scoped.length + '</span><span class="summary-stat-label">Entries</span></div>'
-      + '<div class="summary-stat"><span class="summary-stat-value">' + totalDays + '</span><span class="summary-stat-label">Days</span></div>'
-      + '<div class="summary-stat"><span class="summary-stat-value">' + overallAvg + '<span style="font-size:12px;color:rgba(255,255,255,0.3)">/5</span></span><span class="summary-stat-label">Avg Energy</span></div>'
-      + '</div>';
-    var maxAbs = Math.max.apply(null, stats.map(function(s) { return Math.abs(s.avgDelta); }).concat([1]));
-    listEl.innerHTML = stats.map(function(s) {
-      var color    = s.avgDelta > 0.3 ? '#2ecc71' : s.avgDelta < -0.3 ? '#e74c3c' : '#f1c40f';
-      var barWidth = Math.round((Math.abs(s.avgDelta) / maxAbs) * 100);
-      var deltaStr = (s.avgDelta > 0 ? '+' : '') + s.avgDelta.toFixed(1);
-      var tag      = s.avgDelta > 0.3 ? '&#8593; Giver' : s.avgDelta < -0.3 ? '&#8595; Drainer' : '&#8594; Neutral';
+      return { name:name, count:es.length,
+        avgDelta: es.reduce(function(s,e){ return s+(e.after-e.before); },0)/es.length,
+        avgAfter: es.reduce(function(s,e){ return s+e.after; },0)/es.length };
+    }).sort(function(a,b){ return b.avgDelta-a.avgDelta; });
+    var days = new Set(scoped.map(function(e){ return e.dateKey; })).size;
+    var avg  = (scoped.reduce(function(s,e){ return s+e.after; },0)/scoped.length).toFixed(1);
+    sEl.innerHTML = '<div class="patterns-summary">'
+      +'<div class="summary-stat"><span class="summary-stat-value">'+scoped.length+'</span><span class="summary-stat-label">Entries</span></div>'
+      +'<div class="summary-stat"><span class="summary-stat-value">'+days+'</span><span class="summary-stat-label">Days</span></div>'
+      +'<div class="summary-stat"><span class="summary-stat-value">'+avg+'<span style="font-size:12px;color:rgba(255,255,255,0.3)">/5</span></span><span class="summary-stat-label">Avg Energy</span></div>'
+      +'</div>';
+    var maxAbs = Math.max.apply(null, stats.map(function(s){ return Math.abs(s.avgDelta); }).concat([1]));
+    lEl.innerHTML = stats.map(function(s) {
+      var c = s.avgDelta>0.3?'#2ecc71':s.avgDelta<-0.3?'#e74c3c':'#f1c40f';
+      var w = Math.round(Math.abs(s.avgDelta)/maxAbs*100);
+      var ds = (s.avgDelta>0?'+':'')+s.avgDelta.toFixed(1);
+      var tag = s.avgDelta>0.3?'&#8593; Giver':s.avgDelta<-0.3?'&#8595; Drainer':'&#8594; Neutral';
       return '<div class="pattern-card">'
-        + '<div class="pattern-top"><span class="pattern-name">' + s.name + '</span><span class="pattern-avg" style="color:' + color + '">' + deltaStr + '</span></div>'
-        + '<div class="pattern-bar-wrap"><div class="pattern-bar" style="width:' + barWidth + '%;background:' + color + '"></div></div>'
-        + '<div class="pattern-meta">'
-        + '<span class="pattern-meta-item">Logged <span>' + s.count + '&times;</span></span>'
-        + '<span class="pattern-meta-item">Avg after <span>' + s.avgAfter.toFixed(1) + '/5</span></span>'
-        + '<span class="pattern-meta-item" style="color:' + color + '">' + tag + '</span>'
-        + '</div></div>';
+        +'<div class="pattern-top"><span class="pattern-name">'+s.name+'</span><span class="pattern-avg" style="color:'+c+'">'+ds+'</span></div>'
+        +'<div class="pattern-bar-wrap"><div class="pattern-bar" style="width:'+w+'%;background:'+c+'"></div></div>'
+        +'<div class="pattern-meta">'
+        +'<span class="pattern-meta-item">Logged <span>'+s.count+'&times;</span></span>'
+        +'<span class="pattern-meta-item">Avg after <span>'+s.avgAfter.toFixed(1)+'/5</span></span>'
+        +'<span class="pattern-meta-item" style="color:'+c+'">'+tag+'</span>'
+        +'</div></div>';
     }).join('');
   }
 
   function updateSubmit() {
-    var btn   = el('submit-btn');
-    var ready = selectedBefore !== null && selectedAfter !== null;
-    btn.classList.toggle('ready', ready);
-    btn.classList.remove('saved');
-    btn.textContent = 'Log Entry';
+    var ready = selectedBefore!==null && selectedAfter!==null;
+    el('submit-btn').classList.toggle('ready', ready);
+    el('submit-btn').classList.remove('saved');
+    el('submit-btn').textContent = 'Log Entry';
   }
 
   function renderAll() {
@@ -1078,189 +620,155 @@
     renderTabs();
     renderInsights();
     renderEntries();
-    renderPatterns();
     renderDataActions();
+    renderPatterns();
     renderActivityPicker();
     renderDots('dots-before', selectedBefore);
     renderDots('dots-after',  selectedAfter);
     updateSubmit();
   }
 
-  // ─── Event Delegation ────────────────────────────────────────────────────────
+  // ── Tab switching ────────────────────────────────────────────────────────────
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.dataset.tab===name); });
+    document.querySelectorAll('.view').forEach(function(v){ v.classList.toggle('active', v.id==='view-'+name); });
+  }
+
+  // ── Event delegation ─────────────────────────────────────────────────────────
 
   document.addEventListener('click', function(e) {
-    // Energy dots
     var dot = e.target.closest('.energy-dot');
     if (dot) {
       var v = parseInt(dot.dataset.v);
-      if (dot.dataset.dotid === 'dots-before') { selectedBefore = v; renderDots('dots-before', selectedBefore); }
-      if (dot.dataset.dotid === 'dots-after')  { selectedAfter  = v; renderDots('dots-after',  selectedAfter);  }
-      updateSubmit();
-      return;
+      if (dot.dataset.dotid==='dots-before') { selectedBefore=v; renderDots('dots-before',v); }
+      if (dot.dataset.dotid==='dots-after')  { selectedAfter=v;  renderDots('dots-after',v);  }
+      updateSubmit(); return;
     }
-    // Activity pills
     var pill = e.target.closest('.activity-pill');
-    if (pill) {
-      selectedActivity = pill.dataset.activity;
-      renderActivityPicker();
-      return;
-    }
-    // Delete entry
+    if (pill) { selectedActivity=pill.dataset.activity; renderActivityPicker(); return; }
+
     var del = e.target.closest('.delete-btn');
     if (del) {
       var id = parseInt(del.dataset.id);
-      entries = entries.filter(function(e) { return e.id !== id; });
-      save();
-      renderAll();
+      entries = entries.filter(function(e){ return e.id!==id; });
+      save(); renderAll(); return;
+    }
+    var tab = e.target.closest('.tab');
+    if (tab) { switchTab(tab.dataset.tab); return; }
+
+    var scope = e.target.closest('.scope-btn');
+    if (scope) {
+      patternsScope = scope.dataset.scope==='all'?'all':parseInt(scope.dataset.scope);
+      document.querySelectorAll('.scope-btn').forEach(function(b){ b.classList.toggle('active',b===scope); });
+      renderPatterns(); return;
+    }
+    var seg = e.target.closest('.seg-btn');
+    if (seg) {
+      selectedTime = seg.dataset.time;
+      document.querySelectorAll('.seg-btn').forEach(function(b){ b.classList.toggle('selected',b===seg); });
       return;
     }
   });
 
-  // ─── Form ────────────────────────────────────────────────────────────────────
+  // ── Form submit ──────────────────────────────────────────────────────────────
 
   el('submit-btn').addEventListener('click', function() {
-    if (selectedBefore === null || selectedAfter === null) return;
-    var entry = {
-      id:       Date.now(),
-      dateKey:  TODAY_KEY,
-      date:     TODAY_LABEL,
-      time:     selectedTime,
-      activity: selectedActivity,
-      before:   selectedBefore,
-      after:    selectedAfter,
-      note:     el('note-input').value.trim(),
-    };
-    entries.unshift(entry);
+    if (selectedBefore===null || selectedAfter===null) return;
+    var note = el('note-field').textContent.trim();
+    entries.unshift({ id:Date.now(), dateKey:TODAY_KEY, date:TODAY_LABEL,
+      time:selectedTime, activity:selectedActivity, before:selectedBefore, after:selectedAfter, note:note });
     save();
-    var btn = el('submit-btn');
-    btn.textContent = '✓ Saved';
-    btn.classList.add('saved');
+    el('submit-btn').textContent = '✓ Saved';
+    el('submit-btn').classList.add('saved');
     setTimeout(function() {
-      selectedBefore = null;
-      selectedAfter  = null;
-      el('note-input').value = '';
-      viewDate = new Date();
-      switchTab('log');
-      renderAll();
+      selectedBefore=null; selectedAfter=null;
+      el('note-field').textContent='';
+      viewDate=new Date(); switchTab('log'); renderAll();
     }, 800);
   });
 
-  document.querySelectorAll('[data-time]').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      selectedTime = btn.dataset.time;
-      document.querySelectorAll('[data-time]').forEach(function(b) {
-        b.classList.toggle('selected', b === btn);
-      });
-    });
-  });
+  // ── Navigation ───────────────────────────────────────────────────────────────
 
-  // ─── Navigation ──────────────────────────────────────────────────────────────
+  el('nav-prev').addEventListener('click', function(){ stepDay(-1); });
+  el('nav-next').addEventListener('click', function(){ stepDay(1); });
 
-  el('nav-prev').addEventListener('click', function() { stepDay(-1); });
-  el('nav-next').addEventListener('click', function() { stepDay(1); });
-
-  document.querySelectorAll('.tab').forEach(function(btn) {
-    btn.addEventListener('click', function() { switchTab(btn.dataset.tab); });
-  });
-
-  document.querySelectorAll('.scope-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      patternsScope = btn.dataset.scope === 'all' ? 'all' : parseInt(btn.dataset.scope);
-      document.querySelectorAll('.scope-btn').forEach(function(b) { b.classList.toggle('active', b === btn); });
-      renderPatterns();
-    });
-  });
-
-  // ─── Export / Import ─────────────────────────────────────────────────────────
+  // ── Export ───────────────────────────────────────────────────────────────────
 
   el('export-btn').addEventListener('click', function() {
     if (!entries.length) return;
-    var payload = { version: 1, exported: new Date().toISOString(), entries: entries };
-    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    var url  = URL.createObjectURL(blob);
-    var a    = document.createElement('a');
-    a.href   = url;
-    a.download = 'energy-diary-' + new Date().toISOString().slice(0, 10) + '.json';
+    var blob = new Blob([JSON.stringify({version:1,exported:new Date().toISOString(),entries:entries},null,2)],{type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'energy-diary-'+new Date().toISOString().slice(0,10)+'.json';
     a.click();
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(a.href);
   });
 
-  el('import-trigger-btn').addEventListener('click', function() {
-    el('file-input').value = '';
-    el('file-input').click();
+  // ── Import (file input created on the fly — never in the DOM at rest) ────────
+
+  el('import-btn').addEventListener('click', function() {
+    var input = document.createElement('input');
+    input.type = 'file'; input.accept = '.json';
+    input.addEventListener('change', function() {
+      var file = input.files[0]; if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        try {
+          var parsed   = JSON.parse(ev.target.result);
+          var incoming = Array.isArray(parsed) ? parsed : (parsed.entries||[]);
+          if (!incoming.length) { alert('No entries found in that file.'); return; }
+          var existing = new Set(entries.map(function(e){ return e.id; }));
+          var newOnes  = incoming.filter(function(e){ return !existing.has(e.id); });
+          var dupes    = incoming.length-newOnes.length;
+          pendingImport = newOnes;
+          var msg = 'Found '+incoming.length+' entr'+(incoming.length===1?'y':'ies')+' in file.';
+          if (dupes) msg += ' '+dupes+' already exist and will be skipped.';
+          msg += ' '+newOnes.length+' new entr'+(newOnes.length===1?'y':'ies')+' will be added.';
+          el('import-msg').textContent = msg;
+          el('import-confirm').classList.add('visible');
+        } catch(err) { alert('Could not read that file — make sure it\'s a valid Energy Diary export.'); }
+      };
+      reader.readAsText(file);
+    });
+    input.click();
   });
 
-  el('file-input').addEventListener('change', function(e) {
-    var file = e.target.files[0];
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(ev) {
-      try {
-        var parsed   = JSON.parse(ev.target.result);
-        var incoming = Array.isArray(parsed) ? parsed : (parsed.entries || []);
-        if (!incoming.length) { alert('No entries found in that file.'); return; }
-        var existingIds = new Set(entries.map(function(e) { return e.id; }));
-        var newOnes  = incoming.filter(function(e) { return !existingIds.has(e.id); });
-        var dupes    = incoming.length - newOnes.length;
-        pendingImport = newOnes;
-        var msg = 'Found ' + incoming.length + ' entr' + (incoming.length === 1 ? 'y' : 'ies') + ' in file.';
-        if (dupes > 0) msg += ' ' + dupes + ' already exist and will be skipped.';
-        msg += ' ' + newOnes.length + ' new entr' + (newOnes.length === 1 ? 'y' : 'ies') + ' will be added.';
-        el('import-confirm-msg').textContent = msg;
-        el('import-confirm').classList.add('visible');
-      } catch(err) {
-        alert('Could not read that file — make sure it\'s a valid Energy Diary JSON export.');
-      }
-    };
-    reader.readAsText(file);
-  });
-
-  el('confirm-yes-btn').addEventListener('click', function() {
+  el('confirm-yes').addEventListener('click', function() {
     if (!pendingImport) return;
-    entries = entries.concat(pendingImport).sort(function(a, b) { return b.id - a.id; });
-    save();
-    pendingImport = null;
+    entries = entries.concat(pendingImport).sort(function(a,b){ return b.id-a.id; });
+    save(); pendingImport=null;
     el('import-confirm').classList.remove('visible');
     renderAll();
   });
-
-  el('confirm-no-btn').addEventListener('click', function() {
-    pendingImport = null;
-    el('import-confirm').classList.remove('visible');
+  el('confirm-no').addEventListener('click', function() {
+    pendingImport=null; el('import-confirm').classList.remove('visible');
   });
 
-  // ─── PWA Install ─────────────────────────────────────────────────────────────
+  // ── PWA install ──────────────────────────────────────────────────────────────
 
   window.addEventListener('beforeinstallprompt', function(e) {
-    e.preventDefault();
-    deferredPrompt = e;
+    e.preventDefault(); deferredPrompt=e;
     el('install-banner').classList.add('visible');
   });
-
-  el('install-btn').addEventListener('click', async function() {
+  el('install-btn').addEventListener('click', function() {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    el('install-banner').classList.remove('visible');
+    deferredPrompt.userChoice.then(function(){ deferredPrompt=null; el('install-banner').classList.remove('visible'); });
   });
+  el('install-close').addEventListener('click', function(){ el('install-banner').classList.remove('visible'); });
 
-  el('install-close').addEventListener('click', function() {
-    el('install-banner').classList.remove('visible');
-  });
-
-  // ─── Service Worker ──────────────────────────────────────────────────────────
+  // ── Service worker ───────────────────────────────────────────────────────────
 
   if ('serviceWorker' in navigator) {
-    var swCode = 'const CACHE="energy-diary-v1";'
-      + 'self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll([self.location.pathname])));self.skipWaiting();});'
-      + 'self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim();});'
-      + 'self.addEventListener("fetch",e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));});';
-    var swBlob = new Blob([swCode], { type: 'application/javascript' });
-    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(function(){});
+    var sw = 'const C="energy-diary-v1";'
+      +'self.addEventListener("install",e=>{e.waitUntil(caches.open(C).then(c=>c.addAll([self.location.pathname])));self.skipWaiting();});'
+      +'self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();});'
+      +'self.addEventListener("fetch",e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));});';
+    navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(function(){});
   }
 
-  // ─── Init ────────────────────────────────────────────────────────────────────
+  // ── Init ─────────────────────────────────────────────────────────────────────
   renderAll();
 </script>
 </body>
