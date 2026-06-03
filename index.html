@@ -817,12 +817,16 @@
     </div>
 
     <div class="field">
-      <label class="field-label">Note <span class="optional">(optional)</span></label>
-      <textarea id="note-input" rows="2" placeholder="What felt good or draining about this?"></textarea>
-    </div>
+          <label class="field-label">Note <span class="optional">(optional)</span></label>
+          <div id="note-placeholder"></div>
+        </div>
 
-    <button class="submit-btn" id="submit-btn">Log Entry</button>
-  </div>
+        <button class="submit-btn" id="submit-btn">Log Entry</button>
+      </div>
+
+      <!-- Textarea lives outside any view so it can't bleed through on Android -->
+      <textarea id="note-input" rows="2" placeholder="What felt good or draining about this?"
+        style="display:none;width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:13px 14px;color:#e8e0d0;font-family:'Lora',Georgia,serif;font-style:italic;font-size:14px;resize:none;line-height:1.6;"></textarea>
 
 </div>
 
@@ -886,6 +890,15 @@
   function switchTab(name) {
     document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+    var textarea = el('note-input');
+    var placeholder = el('note-placeholder');
+    if (name === 'add' && placeholder) {
+      placeholder.appendChild(textarea);
+      textarea.style.display = 'block';
+    } else {
+      textarea.style.display = 'none';
+      document.body.appendChild(textarea);
+    }
   }
 
   // ─── Render ──────────────────────────────────────────────────────────────────
